@@ -16,7 +16,7 @@ class BaseCrawler(ABC):
         content = self._get()
 
         if save:
-            path = self._save_dir + "/" + str(time.time()) + ".json"
+            path = self._save_dir + "/" + str(int(time.time())) + ".json"
             write_json(path, content)
 
         return content
