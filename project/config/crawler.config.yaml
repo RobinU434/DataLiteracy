@@ -1,19 +1,39 @@
 - name: DWDCrawler
   api_identifier: stationOverviewExtended
   station_ids: 
-    - 10865
-    - 420
-    - 5906  # Mannheim
-    - 3734  # Obersulm-Willsbach
-    - 4177  # Rheinstetten
-    - 4928  # Stuttgart (Schnarrenberg)
-    - 6262  # Schwäbisch Gmünd-Weiler
-    - 5562  # Neubulach-Oberhaugstett
-    - 7331  # Hermaringen-Allewind
-    - 1602  # Ohlsbach
-    - 3278  # Metzingen
-    - 5155  # Ulm
-    - 1443  # Freiburg
-    - 5229  # Villingen Schwenningen
-    - 13715  # Biberach an der Riß
-    - 2712  # Konstanz
+    - Q771  # Altheim,KreisBiberach
+    - Q411  # Baden-Baden-Geroldsau
+    - Q740  # Balingen-Bronnhaupten
+    - Q055  # Buchen,Kr.Neckar-Odenwald
+    - Q811  # Buchenbach
+    - Q824  # Dachsberg-Wolpadingen
+    - Q382  # Ellwangen-Rindelbach
+    - Q712  # Elzach-Fisnacht
+    - Q702  # Emmendingen-Mundingen
+    - Q221  # Eppingen-Elsenz
+    - Q978  # Friedrichshafen-Unterraderach
+    - Q848  # Geisingen
+    - Q351  # Großerlach-Mannenweiler
+    - Q651  # Hechingen
+    - Q485  # Hermaringen-Allewind
+    - Q292  # Kirchberg/Jagst-Herboldshausen
+    - Q579  # Merklingen
+    - Q887  # Müllheim
+    - Q671  # Münsingen-Apfelstetten
+    - Q437  # Neubulach-Oberhaugstett
+    - Q061  # Notzingen
+    - Q242  # Obersulm-Willsbach
+    - Q518  # Ohlsbach
+    - Q332  # Pforzheim-Ispringen
+    - Q864  # Pfullendorf
+    - Q440  # Renningen-IhingerHof
+    - Q404  # Rheinau-Memprechtshofen
+    - Q733  # Rottweil
+    - Q341  # Sachsenheim
+    - Q378  # SchwäbischGmünd-Weiler
+    - Q788  # Sigmaringen-Laiz
+    - Q942  # Singen
+    - Q738  # Villingen-Schwenningen
+    - Q879  # Weingarten,Kr.Ravensburg
+    - Q622  # Wolfach
+    - Q926  # Wutöschingen-Ofteringen
