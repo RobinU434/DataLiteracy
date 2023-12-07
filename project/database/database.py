@@ -1,5 +1,6 @@
 from typing import List
 from pandas import DataFrame
+from project.database.utils.decorator import check_connection
 
 from sqlalchemy import Date, MetaData, Table, Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.engine import Engine
@@ -11,11 +12,18 @@ class Database:
     def __init__(
         self,
         user_name: str,
-        passwort: str,
+        password: str,
         db_name: str,
         host_ip: str = "127.0.0.1",
         port: int = 3306,
     ) -> None:
+        # connection credential
+        self._user_name = user_name
+        self._password = password
+        self._db_name = db_name
+        self._host_ip = host_ip
+        self._port = port
+
         self._sources: Table
         self._api_calls: Table
         self._temperature: Table
@@ -27,12 +35,18 @@ class Database:
         self._daily: Table
         self._meta = self._setup_meta_data()
 
+        self._engine: Engine
+
+    def connect(self):
+        if hasattr(self, "_engine"):
+            return
+
         self._engine = setup_engine(
-            user_name=user_name,
-            passwort=passwort,
-            db_name=db_name,
-            host_ip=host_ip,
-            port=port,
+            user_name=self._user_name,
+            passwort=self._passwort,
+            db_name=self._db_name,
+            host_ip=self._host_ip,
+            port=self._port,
         )
 
 
@@ -131,12 +145,10 @@ class Database:
 
         return meta
 
+    @check_connection
     def build_tables(self):
         self._meta.create_all(self._engine)
 
-    def insert(self, data: List[DataFrame]):
-        """expect a dataframe with columns 
-
-        Args:
-            data (List[DataFrame]): _description_
-        """
+    @check_connection
+    def insert(self):
+        pass
