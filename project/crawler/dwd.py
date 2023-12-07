@@ -9,7 +9,7 @@ class DWDCrawler(BaseCrawler):
         super().__init__()
 
         # TODO: remove test
-        self._save_dir = "./data/dwd/test"
+        self._save_dir = "./project/data/dwd/test"
 
         self._url = self._build_url(api_identifier, station_ids)
 
@@ -19,7 +19,7 @@ class DWDCrawler(BaseCrawler):
         url += api_identifier
 
         url += "?stationIds="
-        url += str(station_ids).strip("[]").replace(" ", "")
+        url += str(station_ids).strip("[]").replace(" ", "").replace("'", "")
         return url
 
     def _get(self) -> Dict[str, Any]:
