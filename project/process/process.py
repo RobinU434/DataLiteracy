@@ -1,7 +1,7 @@
 from typing import List
 from project.crawler.base import BaseCrawler
 import project.crawler as crawler
-from project.crawler.wrapper import CrawlerManager
+from project.crawler.manager import CrawlerManager
 from project.database.database import Database
 from project.utils.file_system import load_yaml
 
@@ -16,7 +16,7 @@ class DataProcess:
 
         self._db = Database(
             user_name="root",
-            passwort="example",
+            password="example",
             db_name="WeatherData",
             host_ip="172.19.0.4",
             # host_ip="mariadb.data_literacy_network",
@@ -27,7 +27,7 @@ class DataProcess:
 
     def _build_crawler(self):
         self._crawler = []
-        for crawler_config in load_yaml("project/config/crawler.config.yaml"):
+        for crawler_config in load_yaml("project/config/crawler_test.config.yaml"):
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
             self._crawler.append(crawler_class(**crawler_config))
@@ -46,7 +46,7 @@ class DataProcess:
             crawler_config_path (str): crawler config for individual apis
         """
         self._build_crawler()
-        crawler_manager = CrawlerManager(self._crawler, "01:00")
+        crawler_manager = CrawlerManager(self._crawler, "00:10")
         crawler_manager.start()
 
     def analyse(self):
