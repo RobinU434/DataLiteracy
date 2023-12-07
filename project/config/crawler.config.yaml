@@ -1,0 +1,19 @@
+- name: DWDCrawler
+  api_identifier: stationOverviewExtended
+  station_ids: 
+    - 10865
+    - 420
+    - 5906  # Mannheim
+    - 3734  # Obersulm-Willsbach
+    - 4177  # Rheinstetten
+    - 4928  # Stuttgart (Schnarrenberg)
+    - 6262  # Schwäbisch Gmünd-Weiler
+    - 5562  # Neubulach-Oberhaugstett
+    - 7331  # Hermaringen-Allewind
+    - 1602  # Ohlsbach
+    - 3278  # Metzingen
+    - 5155  # Ulm
+    - 1443  # Freiburg
+    - 5229  # Villingen Schwenningen
+    - 13715  # Biberach an der Riß
+    - 2712  # Konstanz
