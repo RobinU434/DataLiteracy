@@ -1,6 +1,0 @@
-requests
-sqlalchemy
-schedule
-mariadb
-pandas
-PyArgWriter @ git+https://github.com/RobinU434/PyArgWritery
