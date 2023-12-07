@@ -1,0 +1,4 @@
+- name: DWDCrawler
+  api_identifier: stationOverviewExtended
+  station_ids: 
+    - Q771  # Altheim,KreisBiberach
