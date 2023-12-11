@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "dataliteracy"
+version = "0.1.0"
+description = ""
+authors = ["Robin Uhrich <robin.uhrich@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.2"
+requests = "^2.31.0"
+sqlalchemy = "^2.0.23"
+schedule = "^1.2.1"
+pandas = "^2.1.4"
+pyaml = "^23.9.7"
+wget = "^3.2"
+
+
+[tool.poetry.group.dev.dependencies]
+mariadb = "^1.1.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
