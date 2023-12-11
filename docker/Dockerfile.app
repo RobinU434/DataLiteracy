@@ -1,9 +1,14 @@
-FROM python:latest
+FROM ubuntu:latest
 
-WORKDIR /project
+WORKDIR /datalit
 
 RUN apt update
-RUN apt install libmariadb-dev
+
+RUN apt install -y apt-utils 
+RUN apt install -y python3
+RUN apt install -y python3-pip
+
+RUN apt install -y libmariadb-dev
 
 RUN pip install --upgrade pip
 RUN ls
@@ -12,4 +17,5 @@ RUN pip install requests \
                 sqlalchemy \
                 schedule \
                 mariadb \
+                pyaml\
                 pandas

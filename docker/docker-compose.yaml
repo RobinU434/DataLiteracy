@@ -24,10 +24,10 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.app
     volumes:
-      - ../project:/project
+      - ../project:/datalit/project
     networks:
       - data_literacy_network
-
+    command: python3 -m project start-crawler
 
 networks:
   data_literacy_network:

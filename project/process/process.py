@@ -27,7 +27,7 @@ class DataProcess:
 
     def _build_crawler(self):
         self._crawler = []
-        for crawler_config in load_yaml("project/config/crawler_test.config.yaml"):
+        for crawler_config in load_yaml("project/config/crawler.config.yaml"):
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
             self._crawler.append(crawler_class(**crawler_config))
