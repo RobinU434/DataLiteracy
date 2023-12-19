@@ -1,5 +1,3 @@
-
-
 from typing import Callable
 
 
@@ -8,4 +6,5 @@ def check_connection(db_func: Callable):
         if hasattr(self, "_engine"):
             self.connect()
         return db_func(self, *args, **kwargs)
+
     return inner

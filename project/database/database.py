@@ -1,8 +1,16 @@
-from typing import List
-from pandas import DataFrame
 from project.database.utils.decorator import check_connection
 
-from sqlalchemy import Date, MetaData, Table, Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import (
+    Date,
+    MetaData,
+    Table,
+    Column,
+    Integer,
+    String,
+    Float,
+    DateTime,
+    ForeignKey,
+)
 from sqlalchemy.engine import Engine
 
 from project.database.utils.db_connection import setup_engine
@@ -49,7 +57,6 @@ class Database:
             port=self._port,
         )
 
-
     def _setup_meta_data(self) -> MetaData:
         meta = MetaData()
 
@@ -60,7 +67,9 @@ class Database:
             Column("name", String(64)),  # Station name or location
             Column("latitude", Float),
             Column("longitude", Float),
-            Column("provider", String(64)),  # special case: if one provider has multiple forecasts -> _XX at the end
+            Column(
+                "provider", String(64)
+            ),  # special case: if one provider has multiple forecasts -> _XX at the end
             Column("height", Float),
         )
 
@@ -101,7 +110,7 @@ class Database:
             Column("pressure", Float),
         )
 
-        self._humidity =  Table(
+        self._humidity = Table(
             "humidity",
             meta,
             Column("id", Integer, primary_key=True),
@@ -139,7 +148,7 @@ class Database:
             Column("temperatur_max", Float),
             Column("precipetation", Float),
             Column("wind_speed", Float),
-            Column("wind_direction", Float)
+            Column("wind_direction", Float),
         )
         self._daily.insert()
 

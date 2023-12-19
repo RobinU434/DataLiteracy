@@ -17,7 +17,7 @@ def execute(args: dict) -> bool:
 
         case "get":
             module.get()
-        
+
         case _:
             return False
     return True
@@ -37,6 +37,7 @@ def main() -> None:
     args_dict = vars(args)
     if not execute(args_dict):
         parser.print_usage()
+
 
 if __name__ == "__main__":
     main()

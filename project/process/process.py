@@ -31,7 +31,7 @@ class DataProcess:
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
             self._crawler.append(crawler_class(**crawler_config))
-        
+
     def build_db(self):
         """
         generate table in SQL data base

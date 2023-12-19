@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import json
 from typing import Any, Dict
 import time
 
@@ -20,7 +19,7 @@ class BaseCrawler(ABC):
             write_json(path, content)
 
         return content
-    
+
     @abstractmethod
     def _build_url(self) -> str:
         raise NotImplementedError
@@ -28,5 +27,3 @@ class BaseCrawler(ABC):
     @abstractmethod
     def _get(self) -> Dict[str, Any]:
         raise NotImplementedError
-    
-
