@@ -15,8 +15,11 @@ pandas = "^2.1.4"
 pyaml = "^23.9.7"
 wget = "^3.2"
 
-
 [tool.poetry.group.dev.dependencies]
+pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter", tag = "v0.1.0-beta.1"}
+jupyter = "^1.0.0"
+
+[tool.poetry.group.crawler.dependencies]
 mariadb = "^1.1.8"
 
 [build-system]
