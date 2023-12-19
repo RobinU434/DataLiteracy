@@ -20,6 +20,9 @@ pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter", tag = "v0.1.0-b
 jupyter = "^1.0.0"
 ruff = "^0.1.8"
 
+[tool.poetry.group.crawler]
+optional = true
+
 [tool.poetry.group.crawler.dependencies]
 mariadb = "^1.1.8"
 
