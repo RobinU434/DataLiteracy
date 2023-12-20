@@ -1,0 +1,313 @@
+[
+	{
+		"coord": {
+			"latitude": 48.533,
+			"longitude": 9.05
+		},
+		"distance_tübingen_km": 1.4531356,
+		"data_avail": [
+			{
+				"Kennung": "PE",
+				"Stations-kennung": "10937",
+				"Beginn": "1955-02-06",
+				"Ende": "2023-11-19",
+				"Stationsname": "Tübingen (Ph)",
+				"Stations_ID": 10937
+			}
+		],
+		"Stationsname": [
+			"Tübingen (Ph)"
+		],
+		"Stations_ID": [
+			10937
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.52,
+			"longitude": 9.12
+		},
+		"distance_tübingen_km": 5.023319,
+		"data_avail": [
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71077",
+				"Beginn": "2002-04-01",
+				"Ende": "2023-11-30",
+				"Stationsname": "Kusterdingen",
+				"Stations_ID": 6274
+			}
+		],
+		"Stationsname": [
+			"Kusterdingen"
+		],
+		"Stations_ID": [
+			6274
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.47,
+			"longitude": 8.969
+		},
+		"distance_tübingen_km": 8.279171,
+		"data_avail": [
+			{
+				"Kennung": "MN",
+				"Stations-kennung": "Q554",
+				"Beginn": "2004-10-25",
+				"Ende": "2023-12-02",
+				"Stationsname": "Rottenburg-Kiebingen",
+				"Stations_ID": 4294
+			},
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71064",
+				"Beginn": "1979-07-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Rottenburg-Kiebingen",
+				"Stations_ID": 4294
+			}
+		],
+		"Stationsname": [
+			"Rottenburg-Kiebingen"
+		],
+		"Stations_ID": [
+			4294
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.627,
+			"longitude": 9.071
+		},
+		"distance_tübingen_km": 11.980882,
+		"data_avail": [
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71113",
+				"Beginn": "1931-01-01",
+				"Ende": "2023-11-29",
+				"Stationsname": "Weil im Schönbuch",
+				"Stations_ID": 5409
+			}
+		],
+		"Stationsname": [
+			"Weil im Schönbuch"
+		],
+		"Stations_ID": [
+			5409
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.406,
+			"longitude": 9.189
+		},
+		"distance_tübingen_km": 16.228176,
+		"data_avail": [
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71067",
+				"Beginn": "1931-01-01",
+				"Ende": "2023-11-30",
+				"Stationsname": "Sonnenbühl-Genkingen",
+				"Stations_ID": 4757
+			}
+		],
+		"Stationsname": [
+			"Sonnenbühl-Genkingen"
+		],
+		"Stations_ID": [
+			4757
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.538,
+			"longitude": 9.273
+		},
+		"distance_tübingen_km": 16.445154,
+		"data_avail": [
+			{
+				"Kennung": "EB",
+				"Stations-kennung": "02863",
+				"Beginn": "2003-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "KL",
+				"Stations-kennung": "02863",
+				"Beginn": "2003-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "MN",
+				"Stations-kennung": "Q561",
+				"Beginn": "2002-10-24",
+				"Ende": "2023-12-02",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71103",
+				"Beginn": "1941-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "SO",
+				"Stations-kennung": "02863",
+				"Beginn": "2003-01-05",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "SY",
+				"Stations-kennung": "Q561",
+				"Beginn": "2003-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			},
+			{
+				"Kennung": "TU",
+				"Stations-kennung": "02863",
+				"Beginn": "2009-04-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Metzingen",
+				"Stations_ID": 3278
+			}
+		],
+		"Stationsname": [
+			"Metzingen"
+		],
+		"Stations_ID": [
+			3278
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.592,
+			"longitude": 8.854
+		},
+		"distance_tübingen_km": 16.665573,
+		"data_avail": [
+			{
+				"Kennung": "MN",
+				"Stations-kennung": "Q713",
+				"Beginn": "2005-06-13",
+				"Ende": "2023-12-02",
+				"Stationsname": "Herrenberg",
+				"Stations_ID": 2159
+			},
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71070",
+				"Beginn": "1978-04-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Herrenberg",
+				"Stations_ID": 2159
+			}
+		],
+		"Stationsname": [
+			"Herrenberg"
+		],
+		"Stations_ID": [
+			2159
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.375,
+			"longitude": 8.98
+		},
+		"distance_tübingen_km": 16.980848,
+		"data_avail": [
+			{
+				"Kennung": "KL",
+				"Stations-kennung": "02754",
+				"Beginn": "1947-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			},
+			{
+				"Kennung": "MN",
+				"Stations-kennung": "Q651",
+				"Beginn": "2003-06-29",
+				"Ende": "2023-12-02",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			},
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71058",
+				"Beginn": "1931-01-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			},
+			{
+				"Kennung": "SO",
+				"Stations-kennung": "02754",
+				"Beginn": "2005-06-08",
+				"Ende": "2023-12-01",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			},
+			{
+				"Kennung": "SY",
+				"Stations-kennung": "Q651",
+				"Beginn": "2004-06-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			},
+			{
+				"Kennung": "TU",
+				"Stations-kennung": "02754",
+				"Beginn": "2004-06-01",
+				"Ende": "2023-12-01",
+				"Stationsname": "Hechingen",
+				"Stations_ID": 2074
+			}
+		],
+		"Stationsname": [
+			"Hechingen"
+		],
+		"Stations_ID": [
+			2074
+		]
+	},
+	{
+		"coord": {
+			"latitude": 48.692,
+			"longitude": 8.982
+		},
+		"distance_tübingen_km": 19.811165,
+		"data_avail": [
+			{
+				"Kennung": "RR",
+				"Stations-kennung": "71348",
+				"Beginn": "1951-01-01",
+				"Ende": "2023-11-30",
+				"Stationsname": "Sindelfingen",
+				"Stations_ID": 4713
+			}
+		],
+		"Stationsname": [
+			"Sindelfingen"
+		],
+		"Stations_ID": [
+			4713
+		]
+	}
+]

@@ -26,6 +26,11 @@ optional = true
 [tool.poetry.group.crawler.dependencies]
 mariadb = "^1.1.8"
 
+
+[tool.poetry.group.sam_explore.dependencies]
+polars = "^0.20.1"
+geopy = "^2.4.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
