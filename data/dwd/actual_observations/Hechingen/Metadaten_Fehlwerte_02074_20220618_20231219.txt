@@ -1,0 +1,8 @@
+Stations_ID;Stations_Name;Parameter;Von_Datum;Bis_Datum;Anzahl_Fehlwerte;Beschreibung;eor;                                                                                                              
+2074;Hechingen;R1;28.01.2023-09:00;30.01.2023-06:00;45;;eor;                                                                                                                                            
+2074;Hechingen;R1;11.07.2023-23:00;12.07.2023-06:00;7;;eor;                                                                                                                                             
+2074;Hechingen;R1;24.08.2023-20:00;24.08.2023-22:00;2;;eor;                                                                                                                                             
+2074;Hechingen;RS_IND;28.01.2023-09:00;30.01.2023-06:00;45;;eor;                                                                                                                                        
+2074;Hechingen;RS_IND;11.07.2023-23:00;12.07.2023-06:00;7;;eor;                                                                                                                                         
+2074;Hechingen;RS_IND;24.08.2023-20:00;24.08.2023-22:00;2;;eor;                                                                                                                                         
+generiert: 20.12.2023 --  Deutscher Wetterdienst  --                                                                                                                                                    

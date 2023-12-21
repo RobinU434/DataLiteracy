@@ -1,0 +1,7 @@
+Stations_ID;Stationsname;Von_Datum;Bis_Datum
+  2074;Hechingen;18640101;
+
+Stations_ID;Betreibername;Von_Datum;Bis_Datum
+  2074;Wetterdienst;18640101;19521110
+  2074;DWD;19521111;
+generiert: 20.12.2023 --  Deutscher Wetterdienst  --

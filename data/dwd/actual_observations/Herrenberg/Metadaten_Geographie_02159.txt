@@ -1,0 +1,4 @@
+Stations_id;Stationshoehe;Geogr.Breite;Geogr.Laenge;von_datum;bis_datum;Stationsname
+  2159;  431.00; 48.5939;  8.8631;18871201;19200630;Herrenberg
+  2159;  431.00; 48.6029;  8.8743;19780401;19850331;Herrenberg
+  2159;  434.00; 48.5915;  8.8541;20020101;        ;Herrenberg

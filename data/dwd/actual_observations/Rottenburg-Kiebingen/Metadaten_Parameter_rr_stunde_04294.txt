@@ -1,0 +1,6 @@
+Stations_ID;Von_Datum;Bis_Datum;Stationsname;Parameter;Parameterbeschreibung;Einheit;Datenquelle (Strukturversion=SV);Zusatz-Info;Besonderheiten;Literaturhinweis;eor;
+4294;20041026;20231220;Rottenburg-Kiebingen;R1;stdl. Niederschlagshoehe;mm;Daten aus SYNOP-Meldungen (FM 12 ab 01.04.2001 mit neuen nationalen Schlüsselgruppen);in UTC;;;eor;
+4294;20041026;20231220;Rottenburg-Kiebingen;RS_IND;Indikator Niederschlag ja/nein;numerischer Code;Daten aus SYNOP-Meldungen (FM 12 ab 01.04.2001 mit neuen nationalen Schlüsselgruppen);in UTC;;;eor;
+4294;20041026;20120110;Rottenburg-Kiebingen;WRTR;stdl. Niederschlagsform (=Niederschlagshoehe_ind);numerischer Code;Daten aus SYNOP-Meldungen (FM 12 ab 01.04.2001 mit neuen nationalen Schlüsselgruppen);01,02,04,05,07,08,10,11,13,14,16,17,19,20,22,23 UTC=1h Bezugszeitraum;;;eor;
+Legende: FT  = Folgetag; GZ = Gesetzliche Zeit
+generiert: 20.12.2023 --  Deutscher Wetterdienst  --
