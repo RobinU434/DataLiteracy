@@ -1,5 +1,0 @@
-Stations_id;Stationshoehe;Geogr.Breite;Geogr.Laenge;von_datum;bis_datum;Stationsname
-  4294;  342.00; 48.4840;  8.9523;19790625;19921031;Rottenburg-Kiebingen
-  4294;  358.00; 48.4709;  8.9734;19921101;19950331;Rottenburg-Kiebingen
-  4294;  336.00; 48.4804;  8.9740;19950401;20021014;Rottenburg-Kiebingen
-  4294;  360.00; 48.4704;  8.9687;20030301;        ;Rottenburg-Kiebingen

@@ -1,4 +1,4 @@
-import json5
+import json
 import zipfile
 import requests
 import os
@@ -26,15 +26,11 @@ def download_and_extract_zip(url: str, destination_folder: str, unique_descripto
     else:
         print(f"Failed to download: {descriptor}")
 
-with open("project/data/dwd/aggregated_station_info.json") as fp:
-    ret = json5.load(fp)
-
-for position in ret:
-    accepted_measurement = "MN"
-    accepted_stations = [measurement for measurement in position["data_avail"] if "MN" == measurement["Kennung"]]
+def get_measurement_data(position_metadata, accepted_measurement: str):
+    accepted_stations = [measurement for measurement in position_metadata["data_avail"] if accepted_measurement == measurement["Kennung"]]
 
     if len(accepted_stations) == 0:
-        print(f"Skipped because theres no accepted measurement: {position['Stationsname']}")
+        print(f"Skipped because theres no accepted measurement: {position_metadata['Stationsname']}")
     for station in accepted_stations:
         download_and_extract_zip(
             f"https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_0{station['Stations_ID']}_akt.zip",
@@ -42,3 +38,12 @@ for position in ret:
             unique_descriptor=station["Stationsname"],
         )
 
+def main():
+    with open("project/data/dwd/aggregated_station_info.json") as fp:
+        ret = json.load(fp)
+
+    for position in ret:
+        get_measurement_data(position, accepted_measurement="MN")
+
+if __name__=="__main__":
+    main()
