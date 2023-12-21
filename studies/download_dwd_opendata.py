@@ -5,7 +5,10 @@ import os
 import re
 from io import BytesIO
 
-def download_and_extract_zip(url: str, destination_folder: str, unique_descriptor: str | None):
+
+def download_and_extract_zip(
+    url: str, destination_folder: str, unique_descriptor: str | None
+):
     # Create the destination folder if it doesn't exist
     os.makedirs(destination_folder, exist_ok=True)
 
@@ -20,23 +23,31 @@ def download_and_extract_zip(url: str, destination_folder: str, unique_descripto
             #     # if not file_pattern or re.match(file_pattern, file_info.filename):
             #     #     z.extract(file_info, destination_folder)
             #     #     print(f"Extracted: {file_info.filename} from {url}")
-            unique_descriptor_stripped = re.sub(r'\s', '_', unique_descriptor)
+            unique_descriptor_stripped = re.sub(r"\s", "_", unique_descriptor)
             z.extractall(f"{destination_folder}/{unique_descriptor_stripped}")
         print(f"Downloaded and extracted: {descriptor}")
     else:
         print(f"Failed to download: {descriptor}")
 
+
 def get_measurement_data(position_metadata, accepted_measurement: str):
-    accepted_stations = [measurement for measurement in position_metadata["data_avail"] if accepted_measurement == measurement["Kennung"]]
+    accepted_stations = [
+        measurement
+        for measurement in position_metadata["data_avail"]
+        if accepted_measurement == measurement["Kennung"]
+    ]
 
     if len(accepted_stations) == 0:
-        print(f"Skipped because theres no accepted measurement: {position_metadata['Stationsname']}")
+        print(
+            f"Skipped because theres no accepted measurement: {position_metadata['Stationsname']}"
+        )
     for station in accepted_stations:
         download_and_extract_zip(
             f"https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_0{station['Stations_ID']}_akt.zip",
             destination_folder="data/dwd/actual_observations/raw",
             unique_descriptor=station["Stationsname"],
         )
+
 
 def main():
     with open("project/data/dwd/aggregated_station_info.json") as fp:
@@ -45,5 +56,6 @@ def main():
     for position in ret:
         get_measurement_data(position, accepted_measurement="MN")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
