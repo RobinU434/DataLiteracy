@@ -1,7 +1,7 @@
 import polars as pl
 import geopy.distance as gpd
 import datetime as dt
-import json5
+import json
 
 def parse_and_filter_invalid_dates(data: pl.LazyFrame):
     for datecol in ["Beginn", "Ende"]:
@@ -45,11 +45,11 @@ def convert_to_obj(data: pl.LazyFrame):
         row_oriented=True,
         pretty=True, # doesnt work...
     )
-    return json5.loads(unformatted_json_str)
+    return json.loads(unformatted_json_str)
 
 def dump_as_json_to(obj: object, path: str):
     with open(path, mode='wt') as fp:
-        json5.dump(
+        json.dump(
             obj, fp, 
             indent='\t', quote_keys=True, trailing_commas=False,
             ensure_ascii=False,
