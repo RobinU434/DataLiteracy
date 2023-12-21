@@ -1,0 +1,10 @@
+Stations_ID;Stationsname;Von_Datum;Bis_Datum
+  2159;Herrenberg;18871201;19200630
+  2159;Herrenberg;19780401;19850331
+  2159;Herrenberg;20020101;
+
+Stations_ID;Betreibername;Von_Datum;Bis_Datum
+  2159;Wetterdienst;18871201;19200630
+  2159;DWD;19780401;19850331
+  2159;DWD;20020101;
+generiert: 21.12.2023 --  Deutscher Wetterdienst  --

@@ -1,0 +1,10 @@
+Stations_ID;Stationsname;Von_Datum;Bis_Datum
+  3278;Metzingen, Kreis Reutlingen;19240620;20021231
+  3278;Metzingen-Neuhausen;20030101;20080610
+  3278;Metzingen;20081202;
+
+Stations_ID;Betreibername;Von_Datum;Bis_Datum
+  3278;Wetterdienst;19240620;19521110
+  3278;DWD;19521111;20080610
+  3278;DWD;20081202;
+generiert: 21.12.2023 --  Deutscher Wetterdienst  --
