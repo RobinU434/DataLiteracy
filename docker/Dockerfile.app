@@ -11,7 +11,6 @@ RUN apt install -y python3-pip
 RUN apt install -y libmariadb-dev
 
 RUN pip install --upgrade pip
-RUN ls
 
 RUN pip install requests \
                 sqlalchemy \
