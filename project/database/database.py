@@ -150,7 +150,6 @@ class Database:
             Column("wind_speed", Float),
             Column("wind_direction", Float),
         )
-        self._daily.insert()
 
         return meta
 
