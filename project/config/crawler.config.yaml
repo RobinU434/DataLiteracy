@@ -37,3 +37,45 @@
     - Q879  # Weingarten,Kr.Ravensburg
     - Q622  # Wolfach
     - Q926  # Wutöschingen-Ofteringen
+
+
+- name: MeteoBlueCrawler
+  api_package: basic-1h_basic-day
+  format: json
+  coords:
+  - [9.46, 48.148]   # Altheim,KreisBiberach
+  - [8.246, 48.727]  # Baden-Baden-Geroldsau
+  - [8.813, 48.264]  # Balingen-Bronnhaupten
+  - [9.321, 49.518]  # Buchen,Kr.Neckar-Odenwald
+  - [7.998, 47.963]  # Buchenbach
+  - [8.106, 47.7]    # Dachsberg-Wolpadingen
+  - [10.131, 48.99]  # Ellwangen-Rindelbach
+  - [8.109, 48.201]  # Elzach-Fisnacht
+  - [7.835, 48.138]  # Emmendingen-Mundingen
+  - [8.848, 49.166]  # Eppingen-Elsenz
+  - [9.441, 47.685]  # Friedrichshafen-Unterraderach
+  - [8.647, 47.924]  # Geisingen
+  - [9.603, 49.021]  # Großerlach-Mannenweiler
+  - [8.98, 48.375]   # Hechingen
+  - [10.267, 48.61]  # Hermaringen-Allewind
+  - [9.98, 49.18]    # Kirchberg/Jagst-Herboldshausen
+  - [9.764, 48.512]  # Merklingen
+  - [7.639, 47.806]  # Müllheim
+  - [9.484, 48.385]  # Münsingen-Apfelstetten
+  - [8.68, 48.652]   # Neubulach-Oberhaugstett
+  - [9.463, 48.671]  # Notzingen
+  - [9.353, 49.128]  # Obersulm-Willsbach
+  - [7.993, 48.433]  # Ohlsbach
+  - [8.697, 48.933]  # Pforzheim-Ispringen
+  - [9.287, 47.935]  # Pfullendorf
+  - [8.924, 48.743]  # Renningen-IhingerHof
+  - [7.994, 48.67]   # Rheinau-Memprechtshofen
+  - [8.636, 48.182]  # Rottweil
+  - [9.071, 48.957]  # Sachsenheim
+  - [9.874, 48.77]   # SchwäbischGmünd-Weiler
+  - [9.194, 48.072]  # Sigmaringen-Laiz
+  - [8.822, 47.774]  # Singen
+  - [8.461, 48.045]  # Villingen-Schwenningen
+  - [9.621, 47.806]  # Weingarten,Kr.Ravensburg
+  - [8.239, 48.295]  # Wolfach
+  - [8.38, 47.678]   # Wutöschingen-Ofteringen
