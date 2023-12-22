@@ -1,4 +1,6 @@
 from typing import List
+
+import wget
 from project.crawler.base import BaseCrawler
 import project.crawler as crawler
 from project.crawler.manager import CrawlerManager
@@ -49,7 +51,7 @@ class DataProcess:
         crawler_manager = CrawlerManager(self._crawler, "00:10")
         crawler_manager.start()
 
-    def analyse(self):
+    def analyse(self, num_samples: int ):
         """
         start analysis pipeline
         """
@@ -62,4 +64,18 @@ class DataProcess:
         self._build_crawler()
         for crawler in self._crawler:
             content = crawler.get(save=save)
+            print(f"===== {type(crawler).__name__} ====")
             print(content)
+
+    def get_historical(self, station_ids: List[str], save_path: str):
+        """
+        get historical (precipitation, pressure, air temperature) data from the dwd database
+        """
+        pass
+
+    def get_recent(self, station_ids: List[str], save_path: str):
+        """
+        get recent (precipitation, pressure, air temperature) data from the dwd database
+        """
+        pass
+    
