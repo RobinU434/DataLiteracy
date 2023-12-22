@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 project/data/*/*/*.json
+
+lectures/
+data/
+exam_preparation/
