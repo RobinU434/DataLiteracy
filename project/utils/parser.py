@@ -1,11 +1,56 @@
 from argparse import ArgumentParser
 
 
+def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--station-ids",
+        help="_description_",
+        dest="station_ids",
+        type=list,
+    )
+    parser.add_argument(
+        "--save-path",
+        help="_description_",
+        dest="save_path",
+        type=str,
+    )
+    return parser
+
+
+def add_get_historical_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--station-ids",
+        type=int, nargs='+',
+        help="_description_",
+        dest="station_ids",
+    )
+    parser.add_argument(
+        "--save-path",
+        help="_description_",
+        dest="save_path",
+        type=str,
+    )
+    return parser
+
+
 def add_get_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--save",
+        help="_description_. Defaults to True.",
+        dest="save",
+        type=bool,
+        default="True",
+    )
     return parser
 
 
 def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--num-samples",
+        help="_description_",
+        dest="num_samples",
+        type=int,
+    )
     return parser
 
 
@@ -34,13 +79,26 @@ def setup_dataprocess_parser(parser: ArgumentParser) -> ArgumentParser:
         help="start crawler to collect weather data from APIs specified in crawler config",
     )
     start_crawler = add_start_crawler_args(start_crawler)
-    analyse = command_subparser.add_parser("analyse", help="start analysis pipeline")
+    analyse = command_subparser.add_parser(
+        "analyse",
+        help="get historical (precipitation, pressure, air temperature) data from the dwd database",
+    )
     analyse = add_analyse_args(analyse)
     get = command_subparser.add_parser(
         "get",
         help="send request to every embedded crawler and return pandas data frame heads onto terminal",
     )
     get = add_get_args(get)
+    get_historical = command_subparser.add_parser(
+        "get-historical",
+        help="get historical (precipitation, pressure, air temperature) data from the dwd database",
+    )
+    get_historical = add_get_historical_args(get_historical)
+    get_recent = command_subparser.add_parser(
+        "get-recent",
+        help="get recent (precipitation, pressure, air temperature) data from the dwd database",
+    )
+    get_recent = add_get_recent_args(get_recent)
     return parser
 
 

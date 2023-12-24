@@ -13,13 +13,24 @@ def execute(args: dict) -> bool:
             module.start_crawler(crawler_config_path=args["crawler_config_path"])
 
         case "analyse":
-            module.analyse()
+            module.analyse(num_samples=args["num_samples"])
 
         case "get":
-            module.get()
+            module.get(save=args["save"])
+
+        case "get-historical":
+            module.get_historical(
+                station_ids=args["station_ids"], save_path=args["save_path"]
+            )
+
+        case "get-recent":
+            module.get_recent(
+                station_ids=args["station_ids"], save_path=args["save_path"]
+            )
 
         case _:
             return False
+
     return True
 
 
