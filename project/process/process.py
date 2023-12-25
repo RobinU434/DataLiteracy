@@ -1,4 +1,5 @@
 from typing import List
+from project.process.utils.unpack_zip import unzip
 
 import wget
 from project.crawler.base import BaseCrawler
@@ -9,6 +10,7 @@ from project.process.utils.download_dwd_data import build_recent_url, check_stat
 from project.utils.download import get_zips
 from project.utils.file_system import load_yaml
 from tqdm import tqdm
+
 
 class DataProcess:
     """
@@ -71,12 +73,12 @@ class DataProcess:
             print(f"===== {type(crawler).__name__} ====")
             print(content)
 
-    def get_historical(self, station_ids: list, save_path: str):
+    def get_historical(self, station_ids: List[int], save_path: str):
         """get historical (precipitation, pressure, air temperature) data from the dwd database
 
 
         Args:
-            station_ids (List[str]): _description_
+            station_ids (List[int]): _description_
             save_path (str): _description_
 
         Raises:
@@ -84,27 +86,32 @@ class DataProcess:
         """
         raise NotImplementedError
 
-
-    def get_recent(self, station_ids: list, save_path: str):
+    def get_recent(self, station_ids: List[int], save_path: str, unpack: bool = True):
         """get recent (precipitation, pressure, air temperature) data from the dwd database
 
         Args:
-            station_ids (List[str]): station ids from DWD
+            station_ids (List[int]): station ids from DWD
             save_path (str): where you want to store the collected information
+            unpack (bool): if set to true we will also unpack the downloaded zips
         """
-        # hard-coded
-        station_ids = [4189, 13965, 755, 757, 5688, 1197, 1214, 1224, 1255, 6258, 1584, 6259, 2074, 7331, 2575, 2814, 259, 3402, 5562, 6275, 3734, 1602, 3925, 3927, 4160, 4169, 4300, 4349, 6262, 4703, 6263, 5229, 4094, 5664, 5731] 
+        # convert elements of station ids to ints
+        station_ids = list(map(lambda x: int(x), station_ids))
 
         mask = check_station_ids(station_ids)
-        success = 0
+        success_counter = 0
+        file_names = []
         for station_id, valid in tqdm(zip(station_ids, mask)):
             if not valid:
                 continue
             for feature in ["precipitation"]:
                 url = build_recent_url(feature, station_id)
                 file_name = get_zips(url, save_path)
+                file_names.append(file_name)
 
             if len(file_name):
-                success += 1
+                success_counter += 1
 
-        print(f"({success}/{len(station_ids)}) where successful.")
+        print(f"({success_counter}/{len(station_ids)}) where successful.")
+
+        if unpack:
+            unzip(*file_names)

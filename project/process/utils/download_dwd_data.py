@@ -18,7 +18,7 @@ FEATURE_STATION_PROPERTY_MAP = {
     "visibility": "VV",
     "weather_phenomena": "WW",
     "wind": "FF",
-    "wind_synop": "F"
+    "wind_synop": "F",
 }
 
 

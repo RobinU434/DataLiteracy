@@ -4,15 +4,23 @@ from argparse import ArgumentParser
 def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--station-ids",
-        help="_description_",
+        help="station ids from DWD",
         dest="station_ids",
-        type=list,
+        type=str,
+        nargs="+",
     )
     parser.add_argument(
         "--save-path",
-        help="_description_",
+        help="where you want to store the collected information",
         dest="save_path",
         type=str,
+    )
+    parser.add_argument(
+        "--unpack",
+        help="if set to true we will also unpack the downloaded zips",
+        dest="unpack",
+        type=bool,
+        default="True",
     )
     return parser
 
@@ -20,9 +28,10 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
 def add_get_historical_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--station-ids",
-        type=int, nargs='+',
         help="_description_",
         dest="station_ids",
+        type=str,
+        nargs="+",
     )
     parser.add_argument(
         "--save-path",

@@ -25,7 +25,9 @@ def execute(args: dict) -> bool:
 
         case "get-recent":
             module.get_recent(
-                station_ids=args["station_ids"], save_path=args["save_path"]
+                station_ids=args["station_ids"],
+                save_path=args["save_path"],
+                unpack=args["unpack"],
             )
 
         case _:
