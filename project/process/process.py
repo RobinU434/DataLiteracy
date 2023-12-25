@@ -6,7 +6,11 @@ from project.crawler.base import BaseCrawler
 import project.crawler as crawler
 from project.crawler.manager import CrawlerManager
 from project.database.database import Database
-from project.process.utils.download_dwd_data import build_recent_url, check_station_ids
+from project.process.utils.download_dwd_data import (
+    build_recent_url,
+    filter_features,
+    check_station_ids,
+)
 from project.utils.download import get_zips
 from project.utils.file_system import load_yaml
 from tqdm import tqdm
@@ -86,14 +90,23 @@ class DataProcess:
         """
         raise NotImplementedError
 
-    def get_recent(self, station_ids: List[int], save_path: str, unpack: bool = True):
+    def get_recent(
+        self,
+        station_ids: List[int],
+        save_path: str,
+        features: List[str],
+        unpack: bool = True,
+    ):
         """get recent (precipitation, pressure, air temperature) data from the dwd database
 
         Args:
             station_ids (List[int]): station ids from DWD
             save_path (str): where you want to store the collected information
             unpack (bool): if set to true we will also unpack the downloaded zips
+            features (List[str]): features you want to extract from DWD API
         """
+        features = filter_features(features)
+        
         # convert elements of station ids to ints
         station_ids = list(map(lambda x: int(x), station_ids))
 
@@ -103,7 +116,8 @@ class DataProcess:
         for station_id, valid in tqdm(zip(station_ids, mask)):
             if not valid:
                 continue
-            for feature in ["precipitation"]:
+            file_name = ""
+            for feature in features:
                 url = build_recent_url(feature, station_id)
                 file_name = get_zips(url, save_path)
                 file_names.append(file_name)

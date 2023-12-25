@@ -1,4 +1,5 @@
-from typing import List
+import logging
+from typing import Iterable, List
 import pandas as pd
 import numpy as np
 from numpy import ndarray
@@ -45,9 +46,25 @@ def check_station_ids(station_ids: List[str]) -> ndarray:
     return result
 
 
+def filter_features(features: List[str]) -> Iterable[str]:
+    """check if the list of given features is supported by dwd features for recent and historical data
+
+    Args:
+        features (List[str]): list of features
+
+    Returns:
+        Iterable[str]: True if all given features are supported
+    """
+    dwd_features = set(FEATURE_STATION_PROPERTY_MAP.keys())
+    features = set(features)
+    intersection = features.intersection(dwd_features)
+    if intersection != features:
+        logging.warning(f"Only {intersection} out of {features} are supported features")
+    return features
+
+
 def build_recent_url(feature: str, station_id: str):
     url = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/"
-    feature = "precipitation"
     url += feature
     url += "/recent/"
     url += f"stundenwerte_{FEATURE_STATION_PROPERTY_MAP[feature]}_{str(station_id).zfill(5)}_akt.zip"
