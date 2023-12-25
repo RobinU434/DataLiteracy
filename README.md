@@ -1,7 +1,6 @@
 # DataLiteracy
 Course content of Data-Literacy at university of Tübingen 
 
-
 ## Code Base
 
 Note that you have manually create the database WeatherData in the mariadb docker
@@ -96,3 +95,13 @@ You can search the PyPI repositories (the default for `pip`) with `poetry search
 Be sure to also commit the changes made the the [lockfile](./poetry.lock).
 
 Other contributors will have to execute `poetry install --no-root` again afterwards.
+
+
+## Data
+
+In our project we will concentrate on approximatly 40 weather stations across the state of Baden-Württemberg.  
+To download the historical data type:
+
+```bash
+python -m project get-recent --station-ids 4189 13965 755 757 5688 1197 1214 1224 1255 6258 1584 6259 2074 7331 2575 2814 259 3402 5562 6275 3734 1602 3925 3927 4160 4169 4300 4349 6262 4703 6263 5229 4094 5664 5731 --save-path data/dwd/recent/data
+```
