@@ -16,8 +16,15 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
         type=str,
     )
     parser.add_argument(
-        "--unpack",
+        "--features",
         help="if set to true we will also unpack the downloaded zips",
+        dest="features",
+        type=str,
+        nargs="+",
+    )
+    parser.add_argument(
+        "--unpack",
+        help="features you want to extract from DWD API",
         dest="unpack",
         type=bool,
         default="True",
