@@ -20,7 +20,7 @@ matplotlib = "^3.8.2"
 tqdm = "^4.66.1"
 
 [tool.poetry.group.dev.dependencies]
-pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter", tag = "v0.1.0-beta.1"}
+pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter"}
 jupyter = "^1.0.0"
 ruff = "^0.1.8"
 
