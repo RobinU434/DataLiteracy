@@ -27,6 +27,7 @@ def execute(args: dict) -> bool:
             module.get_recent(
                 station_ids=args["station_ids"],
                 save_path=args["save_path"],
+                features=args["features"],
                 unpack=args["unpack"],
             )
 
