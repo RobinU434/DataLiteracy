@@ -25,6 +25,7 @@ def get_recent(feature: str):
     for file in data_files:
         # print(pd.read_csv(data_files[0], sep=";"))
         dfs.append(pd.read_csv(file, sep=";"))
+    
     df = pd.concat(dfs)
 
     df["MESS_DATUM"] = df["MESS_DATUM"].apply(to_date_time)
@@ -33,6 +34,6 @@ def get_recent(feature: str):
 
 
 def set_errors_to_zeros(value: float):
-    if value < -100:
+    if value < -100 or value > 500:
         return 0
     return value
