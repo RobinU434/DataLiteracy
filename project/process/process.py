@@ -120,7 +120,8 @@ class DataProcess:
             for feature in features:
                 url = build_recent_url(feature, station_id)
                 file_name = get_zips(url, save_path)
-                file_names.append(file_name)
+                if len(file_name):
+                    file_names.append(file_name)
 
             if len(file_name):
                 success_counter += 1
