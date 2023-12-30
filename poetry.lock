@@ -907,7 +907,7 @@ files = [
 ]
 
 [package.extras]
-docs = ["Sphinx", "furo"]
+docs = ["Sphinx"]
 test = ["objgraph", "psutil"]
 
 [[package]]
@@ -3397,4 +3397,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f1bbd690104af9d14a9eb5142708d5440636a9836504419661c704432e25432e"
+content-hash = "c4b1c337fb1ae478f4a552aa64d35a75548c6372563f1f2ad1102e14356498d3"
