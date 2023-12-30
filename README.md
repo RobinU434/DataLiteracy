@@ -50,7 +50,7 @@ This will install all dependencies (with precisely the versions in the `poetry.l
 
 When using VSCode (with the Python and Jupyter extensions) and with a simple python file, this virtual environment can simply be selected by selecting the python version in the lower right corner while a python file is opened:
 
-![placement of version selection](./screenshot_interpreter_version.png)
+![placement of version selection](./figures/screenshot_interpreter_version.png)
 
 The virtual environment was automatically discovered for me, its recognizable by the (lowercase) name of the parent folder. Should this not work, with `poetry env info` you can see where the executable is located:
 
@@ -82,7 +82,7 @@ If you want to run the usual web interface of jupyter (google colab is based on 
 
 If instead you want to use VSCode, open that file, select the kernel (upper left corner):
 
-![placement of version selection](./screenshot_kernel_version.png)
+![placement of version selection](./figures/screenshot_kernel_version.png)
 
 Then select 'Select another kernel...', and then 'Python Environments...' and in there you should see the same virtual environment as before.
 
