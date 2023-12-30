@@ -9,7 +9,6 @@ readme = "README.md"
 python = "^3.11"
 numpy = "^1.26.2"
 requests = "^2.31.0"
-sqlalchemy = "^2.0.23"
 schedule = "^1.2.1"
 pandas = "^2.1.4"
 pyaml = "^23.9.7"
@@ -23,17 +22,24 @@ tqdm = "^4.66.1"
 pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter"}
 jupyter = "^1.0.0"
 ruff = "^0.1.8"
+pytest = "^7.4.3"
 
 [tool.poetry.group.crawler]
 optional = true
 
 [tool.poetry.group.crawler.dependencies]
 mariadb = "^1.1.8"
+sqlalchemy = "^2.0.23"
 
 
 [tool.poetry.group.sam_explore.dependencies]
 polars = "^0.20.1"
 geopy = "^2.4.1"
+
+
+[tool.poetry.group.playwright.dependencies]
+pytest-playwright = "^0.4.3"
+pytest = "^7.4.3"
 
 [build-system]
 requires = ["poetry-core"]
