@@ -17,6 +17,7 @@ shapely = "^2.0.2"
 geopandas = "^0.14.1"
 matplotlib = "^3.8.2"
 tqdm = "^4.66.1"
+urllib3 = "<2"
 
 [tool.poetry.group.dev.dependencies]
 pyargwriter = {git = "https://github.com/RobinU434/PyArgWriter"}
