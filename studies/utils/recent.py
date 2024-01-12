@@ -45,9 +45,6 @@ def get_recent(feature: str):
     df = pd.concat(dfs)
 
     df["MESS_DATUM"] = df["MESS_DATUM"].apply(to_date_time)
-    
-    # TODO: correct this. ASSIGNING 0 TO MEASUREMENT ERRORS IS PURELY WRONG
-    df["  R1"] = df["  R1"].apply(set_errors_to_zeros)
 
     return df
 

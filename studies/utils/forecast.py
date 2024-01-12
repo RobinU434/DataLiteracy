@@ -66,5 +66,5 @@ def get_dwd_forecast(feature: str, source_path: str = "../data/dwd") -> DataFram
     # convert time to datetime
     df["call_time"] = df["call_time"].apply(serialized_to_datetime)
     df["time"] = df["time"].apply(serialized_to_datetime)
-    df[feature] = df[feature].apply(set_errors_to_zeros)
+    # df[feature] = df[feature].apply(set_errors_to_zeros)
     return df
