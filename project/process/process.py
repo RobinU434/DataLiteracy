@@ -14,6 +14,7 @@ from project.process.utils.download_dwd_data import (
 from project.utils.download import get_zips
 from project.utils.file_system import load_yaml
 from tqdm import tqdm
+from os import makedirs
 
 
 class DataProcess:
@@ -101,10 +102,13 @@ class DataProcess:
 
         Args:
             station_ids (List[int]): station ids from DWD
-            save_path (str): where you want to store the collected information
+            save_path (str): where you want to store the collected information. It will create this directory if it doesn't exist already.
             unpack (bool): if set to true we will also unpack the downloaded zips
             features (List[str]): features you want to extract from DWD API
         """
+
+        makedirs(save_path, exist_ok=True)
+
         features = filter_features(features)
         
         # convert elements of station ids to ints
