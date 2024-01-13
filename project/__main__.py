@@ -13,7 +13,7 @@ def execute(args: dict) -> bool:
             module.start_crawler(crawler_config_path=args["crawler_config_path"])
 
         case "analyse":
-            module.analyse(num_samples=args["num_samples"])
+            module.analyse()
 
         case "get":
             module.get(save=args["save"])

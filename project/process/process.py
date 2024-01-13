@@ -1,3 +1,5 @@
+import logging
+import subprocess
 from typing import List
 from project.process.utils.unpack_zip import unzip
 
@@ -36,9 +38,11 @@ class DataProcess:
 
         self._crawler: List[BaseCrawler]
 
-    def _build_crawler(self):
+    def _build_crawler(
+        self, crawler_config_path: str = "project/config/crawler.config.yaml"
+    ):
         self._crawler = []
-        for crawler_config in load_yaml("project/config/crawler.config.yaml"):
+        for crawler_config in load_yaml(crawler_config_path):
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
             self._crawler.append(crawler_class(**crawler_config))
@@ -47,24 +51,35 @@ class DataProcess:
         """generate table in SQL data base"""
         self._db.build_tables()
 
-    def start_crawler(self, crawler_config_path: str):
+    def start_crawler(
+        self, crawler_config_path: str = "project/config/crawler.config.yaml"
+    ):
         """
         start crawler to collect weather data from APIs specified in crawler config
 
         Args:
             crawler_config_path (str): crawler config for individual apis
         """
-        self._build_crawler()
+        self._build_crawler(crawler_config_path)
         crawler_manager = CrawlerManager(self._crawler, "00:10")
         crawler_manager.start()
 
-    def analyse(self, num_samples: int):
-        """get historical (precipitation, pressure, air temperature) data from the dwd database
-
-        Args:
-            num_samples (int): _description_
-        """
-        pass
+    def analyse(self):
+        """start pipeline to analyse data."""
+        # load scripts to execute
+        notebooks = load_yaml("project/config/analysation_scripts.yaml")
+        for notebook in notebooks:
+            print("[NbClientApp] Executing ", notebook)
+            cmd = f"jupyter execute {notebook}"
+            result = subprocess.run(
+                cmd, shell=True, capture_output=True, check=False
+            )
+            stderr = result.stderr.decode("utf-8")
+            if "FileNotFoundError:" in stderr:
+                msg = f"No such file or directory: '{notebook}'"
+                logging.error(msg)
+            elif "nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:" in stderr:
+                logging.error("Error while executing the notebook: " + stderr.split("\n")[-3])
 
     def get(self, save: bool = True):
         """send request to every embedded crawler and return pandas data frame heads onto terminal
@@ -110,7 +125,7 @@ class DataProcess:
         makedirs(save_path, exist_ok=True)
 
         features = filter_features(features)
-        
+
         # convert elements of station ids to ints
         station_ids = list(map(lambda x: int(x), station_ids))
 

@@ -11,7 +11,7 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--save-path",
-        help="where you want to store the collected information",
+        help="where you want to store the collected information. It will create this directory if it doesn't exist already.",
         dest="save_path",
         type=str,
     )
@@ -61,12 +61,6 @@ def add_get_args(parser: ArgumentParser) -> ArgumentParser:
 
 
 def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
-    parser.add_argument(
-        "--num-samples",
-        help="_description_",
-        dest="num_samples",
-        type=int,
-    )
     return parser
 
 
@@ -76,6 +70,7 @@ def add_start_crawler_args(parser: ArgumentParser) -> ArgumentParser:
         help="crawler config for individual apis",
         dest="crawler_config_path",
         type=str,
+        default="project/config/crawler.config.yaml",
     )
     return parser
 
@@ -96,8 +91,7 @@ def setup_dataprocess_parser(parser: ArgumentParser) -> ArgumentParser:
     )
     start_crawler = add_start_crawler_args(start_crawler)
     analyse = command_subparser.add_parser(
-        "analyse",
-        help="get historical (precipitation, pressure, air temperature) data from the dwd database",
+        "analyse", help="start pipeline to analyse data. "
     )
     analyse = add_analyse_args(analyse)
     get = command_subparser.add_parser(
