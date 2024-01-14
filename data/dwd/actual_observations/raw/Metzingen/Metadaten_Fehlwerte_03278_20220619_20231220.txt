@@ -1,6 +1,0 @@
-Stations_ID;Stations_Name;Parameter;Von_Datum;Bis_Datum;Anzahl_Fehlwerte;Beschreibung;eor;                                                                                                              
-3278;Metzingen;R1;02.09.2023-07:00;04.09.2023-11:00;52;;eor;                                                                                                                                            
-3278;Metzingen;R1;17.11.2023-08:00;17.11.2023-09:00;1;;eor;                                                                                                                                             
-3278;Metzingen;RS_IND;02.09.2023-07:00;04.09.2023-11:00;52;;eor;                                                                                                                                        
-3278;Metzingen;RS_IND;17.11.2023-08:00;17.11.2023-09:00;1;;eor;                                                                                                                                         
-generiert: 21.12.2023 --  Deutscher Wetterdienst  --                                                                                                                                                    

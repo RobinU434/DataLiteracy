@@ -1,9 +1,0 @@
-Stations_ID;Stationsname;Von_Datum;Bis_Datum
-  4294;Rottenburg;19790625;19921031
-  4294;Rottenburg-Kiebingen;19921101;20021014
-  4294;Rottenburg-Kiebingen;20030301;
-
-Stations_ID;Betreibername;Von_Datum;Bis_Datum
-  4294;DWD;19790625;20021014
-  4294;DWD;20030301;
-generiert: 21.12.2023 --  Deutscher Wetterdienst  --

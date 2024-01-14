@@ -1,9 +1,0 @@
-[Unit]
-Description=Trigger the routine daily
-
-[Timer]
-OnCalendar=*-*-* 1:00:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target
