@@ -11,7 +11,7 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--save-path",
-        help="where you want to store the collected information. It will create this directory if it doesnt exist already.",
+        help="where you want to store the collected information. It will create this directory if it does not exist already.",
         dest="save_path",
         type=str,
     )

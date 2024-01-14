@@ -138,7 +138,7 @@ class DataProcess:
 
         Args:
             station_ids (List[int]): station ids from DWD
-            save_path (str): where you want to store the collected information. It will create this directory if it doesnt exist already.
+            save_path (str): where you want to store the collected information. It will create this directory if it does not exist already.
             unpack (bool): if set to true we will also unpack the downloaded zips
             features (List[str]): features you want to extract from DWD API
         """
