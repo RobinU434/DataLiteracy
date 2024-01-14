@@ -4,10 +4,6 @@ import numpy as np
 import pandas as pd
 import polars as pl
 import datetime
-import sys
-# old leftover from robin
-# TODO: fix this horrible hack once I re-figured out how to do it properly in poetry
-sys.path.append("/".join(sys.path[0].split("/")[:-2]))
 
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent

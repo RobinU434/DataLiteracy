@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["Robin Uhrich <robin.uhrich@gmail.com>"]
 readme = "README.md"
+packages = [
+    {include = "studies"},
+    {include = "project"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"

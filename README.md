@@ -41,7 +41,7 @@ Poetry (version 1.7.1)
 With an installation of `poetry` you really only need to execute a single command in the project root (where the `pyproject.toml` is located):
 
 ```
-poetry install --no-root
+poetry install
 ```
 
 This will install all dependencies (with precisely the versions in the `poetry.lock` file, which is regenerated every time the dependencies are changed) into a virtual environment.
@@ -94,7 +94,7 @@ You can search the PyPI repositories (the default for `pip`) with `poetry search
 
 Be sure to also commit the changes made the the [lockfile](./poetry.lock).
 
-Other contributors will have to execute `poetry install --no-root` again afterwards.
+Other contributors will have to execute `poetry install` again afterwards.
 
 
 ## Data
