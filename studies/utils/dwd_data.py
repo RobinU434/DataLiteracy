@@ -1,13 +1,9 @@
 import logging
 from enum import Enum
-from tqdm import tqdm
-import itertools
 import numpy as np
 import pandas as pd
 import polars as pl
 import datetime
-from project.utils.array import operate_on_same_index
-from project.utils.cast import datetime2timestamp_int
 
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
@@ -19,20 +15,14 @@ def accumulate_and_merge_hist_forecast_window(
     col_to_aggregate: pl.functions.col,
     aggregation_op: pl.Expr,
 ) -> pd.DataFrame:
-    """
-    I dont really get how the actual code was supposed to properly work for temps, but should work with the right arguments
-    """
     forecast = pl.from_pandas(forecast)
     historical = pl.from_pandas(historical)
 
-    # print(forecast, historical)
-
     historical = historical.sort("time")
 
-    # print(historical.filter(pl.col("station_id") == 257))
-
     ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
-    # this will assume 0 for values outside of the timeframe, and result will havelooked in the past.
+    # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
+
     # corrected later
     historical_window_sum_missing_data = (
         historical
@@ -64,8 +54,6 @@ def accumulate_and_merge_hist_forecast_window(
             .explode(["time", "precipitation_real"])
     )
 
-    # print(historical_window_sum)
-
     # thats the pain with polars: trying to do anything but data wrangling is annoying.
     # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
     assert_correctness = historical_window_sum.group_by("station_id").agg((pl.col("time").first() == pl.col("original_start_time")).alias("correct_calc").all())
@@ -74,13 +62,9 @@ def accumulate_and_merge_hist_forecast_window(
 
     assert assert_correctness.select(pl.col("correct_calc").all())["correct_calc"][0]
 
-    # historical.group_by(["station_id"]).agg(pl.col("time").rolling(period=datetime.timedelta(hours=3)).agg(pl.col("precipitation_real").sum()))
-
     historical_window_sum = historical_window_sum.drop("original_start_time")
 
     joined = forecast.join(historical_window_sum, on=["station_id", "time"], how="left")
-
-    # print(joined)
 
     return joined.to_pandas()
 
