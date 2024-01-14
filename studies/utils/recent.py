@@ -5,9 +5,6 @@ import pandas as pd
 from pandas import DataFrame
 from project.process.utils.download_dwd_data import FEATURE_STATION_PROPERTY_MAP
 
-# thats a really bad idea, especially if used in the methods used elsewhere...
-DATA_ROOT_DIRECTORY = "../data/dwd/recent"
-
 def to_date_time(dt: str):
     """_summary_
 
@@ -25,7 +22,7 @@ def to_date_time(dt: str):
     return datetime(year, month, day, hour, 0)
 
 
-def get_recent(feature: str):
+def get_recent(feature: str, data_root_dir: str = "../data/dwd/recent"):
     """_summary_
 
     Args:
@@ -34,7 +31,7 @@ def get_recent(feature: str):
     Returns:
         _type_: _description_
     """
-    path = f"{DATA_ROOT_DIRECTORY}/*{FEATURE_STATION_PROPERTY_MAP[feature]}*/produkt*.txt"
+    path = f"{data_root_dir}/*{FEATURE_STATION_PROPERTY_MAP[feature]}*/produkt*.txt"
     data_files = glob.glob(path)
     dfs: List[DataFrame] = []
     for file in data_files:

@@ -267,7 +267,7 @@ class DWD_Dataset:
             data_column_name,
             columns_to_drop,
         ) = RECENT_FEATURE_TRANSLATOR[feature]
-        precipitation = get_recent(feature=property_name)
+        precipitation = get_recent(feature=property_name, data_root_dir=f"{self._source_path}/recent")
         # clean columns
         real_data = precipitation.drop(columns=columns_to_drop)
         # rename columns
