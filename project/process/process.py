@@ -80,6 +80,7 @@ class DataProcess:
             cmd = f"{'poetry run ' if not use_active_venv else ''}jupyter execute --allow-errors {notebook}"
             result = subprocess.run(cmd, shell=True, capture_output=True, check=False)
             stderr = result.stderr.decode("utf-8")
+            
             if "FileNotFoundError:" in stderr:
                 msg = f"No such file or directory: '{notebook}'"
                 logging.error(msg)
@@ -87,9 +88,8 @@ class DataProcess:
                 "nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:"
                 in stderr
             ):
-                logging.error(
-                    "Error while executing the notebook: " + stderr.split("\n")[-3]
-                )
+                msg = "Error while executing the notebook: " + stderr.split("\n")[-3]
+                logging.error(msg)
             elif "poetry: command not found" in stderr:
                 logging.error(
                     """
