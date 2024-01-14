@@ -24,7 +24,10 @@ def accumulate_and_merge_hist_forecast_window(
 
     historical = historical.sort("time")
 
-    # print(historical.filter(pl.col("station_id") == 257))
+    # print(historical
+    #     .filter(pl.col("station_id") == 259)
+    #     .filter(pl.col("time") > datetime.datetime.fromisoformat("2023-12-08 04:00:00"))
+    # )
 
     ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
     # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
@@ -60,7 +63,10 @@ def accumulate_and_merge_hist_forecast_window(
             .explode(["time", "precipitation_real"])
     )
 
-    # print(historical_window_sum.filter(pl.col("station_id") == 257))
+    # print(historical_window_sum
+    #     .filter(pl.col("station_id") == 259)
+    #     .filter(pl.col("time") > datetime.datetime.fromisoformat("2023-12-08 04:00:00"))
+    # )
 
     # thats the pain with polars: trying to do anything but data wrangling is annoying.
     # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
@@ -396,4 +402,5 @@ class DWD_Dataset:
         return df
 
 if __name__ == "__main__":
+    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
     DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)
