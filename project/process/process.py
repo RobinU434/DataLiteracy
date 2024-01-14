@@ -1,6 +1,7 @@
 import logging
 import subprocess
 from typing import List
+from project.analysis.pipeline import JupyterPipeline
 from project.process.utils.unpack_zip import unzip
 
 import wget
@@ -73,38 +74,12 @@ class DataProcess:
         Args:
             use_active_venv (bool, optional): set this flag if you have poetry installed and would like to run the analysis in with the active python env
         """
-        poetry_prefix = 'poetry run ' if not use_active_venv else ''
+        jupyter_pipeline = JupyterPipeline(
+            use_active_venv=use_active_venv,
+            note_book_listing_path="project/config/analysation_scripts.yaml",
+        )
+        jupyter_pipeline.run()
         
-        # load scripts to execute
-        notebooks = load_yaml("project/config/analysation_scripts.yaml")
-
-        for notebook in notebooks:
-            print("[NbClientApp] Executing ", notebook)
-            cmd = f"{poetry_prefix}jupyter execute --allow-errors {notebook}"
-            result = subprocess.run(cmd, shell=True, capture_output=True, check=False)
-            stderr = result.stderr.decode("utf-8")
-            
-            if "FileNotFoundError:" in stderr:
-                msg = f"No such file or directory: '{notebook}'"
-                logging.error(msg)
-            elif (
-                "nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:"
-                in stderr
-            ):
-                msg = "Error while executing the notebook: " + stderr.split("\n")[-3]
-                logging.error(msg)
-            elif "poetry: command not found" in stderr:
-                logging.error(
-                    """
-                poetry command was not found. 
-                Please either:
-                    * ensure that poetry is visible and all packages are installed
-                    * or if you want to proceed without poetry, create a venv with all dependencies, activate it, and repeat this command with the flag --use-active-venv true
-                """
-                )
-            else:
-                logging.error(stderr)
-
     def get(self, save: bool = True):
         """send request to every embedded crawler and return pandas data frame heads onto terminal
 
