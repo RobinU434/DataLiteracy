@@ -4,6 +4,10 @@ import numpy as np
 import pandas as pd
 import polars as pl
 import datetime
+import sys
+# old leftover from robin
+# TODO: fix this horrible hack once I re-figured out how to do it properly in poetry
+sys.path.append("/".join(sys.path[0].split("/")[:-2]))
 
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
@@ -20,6 +24,8 @@ def accumulate_and_merge_hist_forecast_window(
 
     historical = historical.sort("time")
 
+    # print(historical.filter(pl.col("station_id") == 257))
+
     ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
     # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
 
@@ -30,7 +36,7 @@ def accumulate_and_merge_hist_forecast_window(
             .agg(aggregation_op)
     )
 
-    datapoints_to_drop = forecast_time_step/ACTUAL_TIME_STEP - 1
+    datapoints_to_drop = forecast_time_step/ACTUAL_TIME_STEP
 
     # drop first rows per group and adjust time so it fits forecasts
     historical_window_sum = (
@@ -43,7 +49,7 @@ def accumulate_and_merge_hist_forecast_window(
                     pl.col("time").slice(datapoints_to_drop)
                         # forecasts predict weather for the next time delta, aggregated accordingly.
                         # since polars looks into the past we correct for that.
-                        - (forecast_time_step - ACTUAL_TIME_STEP)
+                        - forecast_time_step
                     )
                     # without this cast the datetime switches to microsecs
                     .dt.cast_time_unit("ns")
@@ -53,6 +59,8 @@ def accumulate_and_merge_hist_forecast_window(
             )
             .explode(["time", "precipitation_real"])
     )
+
+    # print(historical_window_sum.filter(pl.col("station_id") == 257))
 
     # thats the pain with polars: trying to do anything but data wrangling is annoying.
     # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
@@ -386,3 +394,6 @@ class DWD_Dataset:
             df = df.drop(columns=["provider"])
 
         return df
+
+if __name__ == "__main__":
+    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)
