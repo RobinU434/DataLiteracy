@@ -1,8 +1,12 @@
 import logging
 from enum import Enum
-
+from tqdm import tqdm
+import itertools
 import numpy as np
 import pandas as pd
+import datetime
+from project.utils.array import operate_on_same_index
+from project.utils.cast import datetime2timestamp_int
 
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
@@ -36,14 +40,29 @@ RECENT_FEATURE_TRANSLATOR = {
 
 
 class DWD_Dataset:
-    """container for dwd dataset 
-    """
-    def __init__(self, source_path: str, feature: Feature = None):
+    """container for dwd dataset"""
+
+    def __init__(self, source_path: str, feature: Feature = None, model: int = 1):
+        """_summary_
+
+        Args:
+            source_path (str): _description_
+            feature (Feature, optional): _description_. Defaults to None.
+            model (int, optional): from which dwd model. 1: short term. 2: long term. 0: both. Defaults to 1.
+
+        """
+        if model not in [1, 2]:
+            logging.error("Choose either model 1 or 2. But you chose model = " + model)
+            return
+        else:
+            self._model = model
+
         self._source_path = source_path
+        self._feature = feature
         # load station meta information
         self._stations = pd.read_csv(self._source_path + "/stations.tsv", sep="\t")
 
-        if feature is None:
+        if self._feature is None:
             # load all specified features in Features enum
             precipitation_forecast = self._load_forecast(Feature.PRECIPITATION)
             temperature_forecast = self._load_forecast(Feature.TEMPERATURE)
@@ -65,90 +84,60 @@ class DWD_Dataset:
                 on=["station_id", "time"],
             )
 
-        elif isinstance(feature, Feature):
+        elif isinstance(self._feature, Feature):
             # load a specific feature
-            self._forecast = self._load_forecast(feature)
+            self._forecast = self._load_forecast(self._feature)
             # get recent
-            self._real_data = self._load_recent(feature)
+            self._real_data = self._load_recent(self._feature)
 
         else:
-            msg = f"the given feature: {feature} is neither is None nor an element of Feature enum."
+            msg = f"the given feature: {self._feature} is neither is None nor an element of Feature enum."
             logging.error(msg)
             return
 
-        # clean data by removing every point which is outside every forecast
-        min_time = min(self._forecast["time"])
-        self._real_data = self._real_data[self._real_data["time"] >= min_time]
-        # ... and also vise versa on forecasts we can't evaluate because we don't have a reference
-        max_time = max(self._real_data["time"])
-        self._forecast = self._forecast[self._forecast["time"] <= max_time]
+        self._forecast = self._filter_df(self._forecast, model=self._model)
+        # remove samples with out fitting forecast or vise versa a fitting historical sample
+        self._trim_datasets()
 
         # create a merge dataset where we link forecasts and recent data
-        self._merge = pd.merge(
-            self._forecast, self._real_data, on=["time", "station_id"], how="left"
-        )
-
-        # add difference
-        if feature is None:
-            self._merge.insert(
-                len(self._merge.columns),
-                "precipitation_error",
-                self._merge["precipitation_forecast"]
-                - self._merge["precipitation_real"],
-            )
-            self._merge.insert(
-                len(self._merge.columns),
-                "air_temperature_error",
-                self._merge["air_temperature_forecast"]
-                - self._merge["air_temperature_real"],
-            )
-        elif isinstance(feature, Feature):
-            name = RECENT_FEATURE_TRANSLATOR[feature]
-            self._merge.insert(
-                len(self._merge.columns),
-                f"{name}_error",
-                self._merge[f"{name}_forecast"] - self._merge[f"{name}_real"],
-            )
+        self._merge = self._create_merge(self._forecast, self._real_data)
 
         # TODO: correct this. ASSIGNING 0 TO MEASUREMENT ERRORS IS PURELY WRONG
 
-    def get_forecast(self, station_id: int = 0, model: int = 0) -> pd.DataFrame:
+    def get_forecast(self, station_id: int = 0) -> pd.DataFrame:
         """get only forecast data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
-            model (int, optional): from which dwd model. 1: short term. 2: long term. 0: both. Defaults to 0.
 
         Returns:
             pd.DataFrame: processed forecast DataFrame
         """
-        forecast = self._filter_df(self._forecast, station_id, model)
+        forecast = self._filter_df(df=self._forecast, station_id=station_id)
         return forecast
 
-    def get_merge(self, station_id: int = 0, model: int = 0) -> pd.DataFrame:
+    def get_merge(self, station_id: int = 0) -> pd.DataFrame:
         """get merge data with forecast and historical data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
-            model (int, optional): from which dwd model. 1: short term. 2: long term. 0: both. Defaults to 0.
 
         Returns:
             pd.DataFrame: processed DataFrame with forecast and historical data inside
         """
-        merge = self._filter_df(self._merge, station_id, model)
+        merge = self._filter_df(df=self._merge, station_id=station_id)
         return merge
 
-    def get_historical(self, station_id: int = 0, model: int = 0) -> pd.DataFrame:
+    def get_historical(self, station_id: int = 0) -> pd.DataFrame:
         """get only forecast data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
-            model (int, optional): from which dwd model. 1: short term. 2: long term. 0: both. Defaults to 0.
 
         Returns:
             pd.DataFrame: processed forecast DataFrame
         """
-        real_data = self._filter_df(self._real_data, station_id, model)
+        real_data = self._filter_df(df=self._real_data, station_id=station_id)
         return real_data
 
     def get_matrix(self, data_column: str):
@@ -240,6 +229,107 @@ class DWD_Dataset:
 
         return real_data
 
+    def _create_merge(
+        self, forecast: pd.DataFrame, historical: pd.DataFrame
+    ) -> pd.DataFrame:
+        forecast = forecast.copy()
+        historical = historical.copy()
+        if self._model == 1:
+            merge = pd.merge(
+                forecast, historical, on=["time", "station_id"], how="left"
+            )
+        # TODO: make this faster
+        elif self._model == 2:
+            # NOTE: assert that the forecast for self._model=2 is for every three hours
+            # therefor sum the historical data in buckets with a width of three hours
+            station_ids = forecast["station_id"].unique()
+            call_times = forecast["call_time"].unique()
+            for station_id, call_time in tqdm(list(itertools.product(station_ids, call_times)), desc="correct for 3h scope of model 2"):  # list for tqdm bar
+                sub_df_forecast = forecast[
+                    (forecast["call_time"] == call_time)
+                    & (forecast["station_id"] == station_id)
+                ]
+                forecast_times = sorted(sub_df_forecast["time"].unique())
+                min_time = datetime2timestamp_int(forecast_times[0])
+                max_time = datetime2timestamp_int(
+                    forecast_times[-1] + datetime.timedelta(hours=3)
+                )
+                buckets = np.array(
+                    [datetime2timestamp_int(dt) for dt in forecast_times]
+                )
+                # buckets = np.array([dt for dt in forecast_times])
+
+                sub_df_historical = historical[
+                    (historical["station_id"] == station_id)
+                    & (historical["time"].apply(datetime2timestamp_int) >= min_time)
+                    & (historical["time"].apply(datetime2timestamp_int) <= max_time)
+                ]
+                bucket_idx = np.digitize(
+                    sub_df_historical["time"].apply(datetime2timestamp_int), buckets
+                )
+                # correct index
+                bucket_idx -= 1
+                if self._feature == Feature.PRECIPITATION:
+                    operation = np.sum
+                elif self._feature == Feature.TEMPERATURE:
+                    operation = np.mean
+                else:
+                    operation = np.mean
+                    msg = f"No aggregation function implemented for feature: {self._feature}. Fall back to {operation}"
+                    logging.warning(msg)
+
+                
+                # sum the content of each bucket
+                accs = operate_on_same_index(
+                    sub_df_historical["precipitation_real"].values, bucket_idx, operation
+                )
+            
+                # replace values in historical
+                for time, value in zip(forecast_times, accs):
+                    historical.loc[(historical["time"] == time) & (historical["station_id"] == station_id), "precipitation_real"] = value
+                
+                merge = pd.merge(
+                    forecast, historical, on=["time", "station_id"], how="left"
+                )
+        else:
+            pass
+
+        # add difference
+        if self._feature is None:
+            merge.insert(
+                len(merge.columns),
+                "precipitation_error",
+                merge["precipitation_forecast"]
+                - merge["precipitation_real"],
+            )
+            merge.insert(
+                len(merge.columns),
+                "air_temperature_error",
+                merge["air_temperature_forecast"]
+                - merge["air_temperature_real"],
+            )
+        elif isinstance(self._feature, Feature):
+            name, _, _, _ = RECENT_FEATURE_TRANSLATOR[self._feature]
+            merge.insert(
+                len(merge.columns),
+                f"{name}_error",
+                merge[f"{name}_forecast"] - merge[f"{name}_real"],
+            )
+
+        return merge
+
+    def _trim_datasets(self):
+        """clean data by removing every point which is outside every forecast
+        and also vise versa on forecasts we can't evaluate because we don't
+        have a reference
+        """
+        # clean data by removing every point which is outside every forecast
+        min_time = min(self._forecast["time"])
+        self._real_data = self._real_data[self._real_data["time"] >= min_time]
+        # ... and also vise versa on forecasts we can't evaluate because we don't have a reference
+        max_time = max(self._real_data["time"])
+        self._forecast = self._forecast[self._forecast["time"] <= max_time]
+
     def _filter_errors(self, threshold: float = 900):
         """_summary_
 
@@ -260,17 +350,15 @@ class DWD_Dataset:
 
     @staticmethod
     def _filter_df(
-        df: pd.DataFrame, station_id: int = 0, model: int = 0
+        df: pd.DataFrame, station_id: int = 0, model: int = 1
     ) -> pd.DataFrame:
         if station_id > 0:
             df = df[df["station_id"] == station_id]
 
-        if "provider" not in df.columns or model == 0:
+        if "provider" not in df.columns:
             pass
-        elif model > 2 or model < 0:
-            raise ValueError(
-                "Choose either model 1 or 2. If you want to obtain both: 0"
-            )
+        elif model > 2 or model <= 0:
+            raise ValueError("Choose either model 1 or 2.")
         else:
             df = df[df["provider"] == f"DWD_{model}"]
             df = df.drop(columns=["provider"])
