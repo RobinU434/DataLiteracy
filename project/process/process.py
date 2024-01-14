@@ -71,13 +71,16 @@ class DataProcess:
         """start pipeline to analyse data.
 
         Args:
-            use_active_venv (bool, optional): _description_
+            use_active_venv (bool, optional): set this flag if you have poetry installed and would like to run the analysis in with the active python env
         """
+        poetry_prefix = 'poetry run ' if not use_active_venv else ''
+        
         # load scripts to execute
         notebooks = load_yaml("project/config/analysation_scripts.yaml")
+
         for notebook in notebooks:
             print("[NbClientApp] Executing ", notebook)
-            cmd = f"{'poetry run ' if not use_active_venv else ''}jupyter execute --allow-errors {notebook}"
+            cmd = f"{poetry_prefix}jupyter execute --allow-errors {notebook}"
             result = subprocess.run(cmd, shell=True, capture_output=True, check=False)
             stderr = result.stderr.decode("utf-8")
             
