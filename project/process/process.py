@@ -64,22 +64,43 @@ class DataProcess:
         crawler_manager = CrawlerManager(self._crawler, "00:10")
         crawler_manager.start()
 
-    def analyse(self):
-        """start pipeline to analyse data."""
+    def analyse(
+        self,
+        use_active_venv: bool = False,
+    ):
+        """start pipeline to analyse data.
+
+        Args:
+            use_active_venv (bool, optional): _description_
+        """
         # load scripts to execute
         notebooks = load_yaml("project/config/analysation_scripts.yaml")
         for notebook in notebooks:
             print("[NbClientApp] Executing ", notebook)
-            cmd = f"jupyter execute {notebook}"
-            result = subprocess.run(
-                cmd, shell=True, capture_output=True, check=False
-            )
+            cmd = f"{'poetry run ' if not use_active_venv else ''}jupyter execute --allow-errors {notebook}"
+            result = subprocess.run(cmd, shell=True, capture_output=True, check=False)
             stderr = result.stderr.decode("utf-8")
             if "FileNotFoundError:" in stderr:
                 msg = f"No such file or directory: '{notebook}'"
                 logging.error(msg)
-            elif "nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:" in stderr:
-                logging.error("Error while executing the notebook: " + stderr.split("\n")[-3])
+            elif (
+                "nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:"
+                in stderr
+            ):
+                logging.error(
+                    "Error while executing the notebook: " + stderr.split("\n")[-3]
+                )
+            elif "poetry: command not found" in stderr:
+                logging.error(
+                    """
+                poetry command was not found. 
+                Please either:
+                    * ensure that poetry is visible and all packages are installed
+                    * or if you want to proceed without poetry, create a venv with all dependencies, activate it, and repeat this command with the flag --use-active-venv true
+                """
+                )
+            else:
+                logging.error(stderr)
 
     def get(self, save: bool = True):
         """send request to every embedded crawler and return pandas data frame heads onto terminal
@@ -117,7 +138,7 @@ class DataProcess:
 
         Args:
             station_ids (List[int]): station ids from DWD
-            save_path (str): where you want to store the collected information. It will create this directory if it doesn't exist already.
+            save_path (str): where you want to store the collected information. It will create this directory if it doesnt exist already.
             unpack (bool): if set to true we will also unpack the downloaded zips
             features (List[str]): features you want to extract from DWD API
         """

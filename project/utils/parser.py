@@ -11,7 +11,7 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--save-path",
-        help="where you want to store the collected information. It will create this directory if it doesn't exist already.",
+        help="where you want to store the collected information. It will create this directory if it doesnt exist already.",
         dest="save_path",
         type=str,
     )
@@ -61,6 +61,13 @@ def add_get_args(parser: ArgumentParser) -> ArgumentParser:
 
 
 def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--use-active-venv",
+        help="_description_",
+        dest="use_active_venv",
+        type=bool,
+        default="False",
+    )
     return parser
 
 
@@ -91,7 +98,7 @@ def setup_dataprocess_parser(parser: ArgumentParser) -> ArgumentParser:
     )
     start_crawler = add_start_crawler_args(start_crawler)
     analyse = command_subparser.add_parser(
-        "analyse", help="start pipeline to analyse data. "
+        "analyse", help="start pipeline to analyse data."
     )
     analyse = add_analyse_args(analyse)
     get = command_subparser.add_parser(
