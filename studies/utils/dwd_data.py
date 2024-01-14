@@ -4,6 +4,7 @@ from tqdm import tqdm
 import itertools
 import numpy as np
 import pandas as pd
+import polars as pl
 import datetime
 from project.utils.array import operate_on_same_index
 from project.utils.cast import datetime2timestamp_int
@@ -11,6 +12,77 @@ from project.utils.cast import datetime2timestamp_int
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
 
+def accumulate_and_merge_hist_forecast_window(
+    forecast: pd.DataFrame,
+    historical: pd.DataFrame,
+    forecast_time_step: datetime.timedelta,
+    col_to_aggregate: pl.functions.col,
+    aggregation_op: pl.Expr,
+) -> pd.DataFrame:
+    """
+    I dont really get how the actual code was supposed to properly work for temps, but should work with the right arguments
+    """
+    forecast = pl.from_pandas(forecast)
+    historical = pl.from_pandas(historical)
+
+    # print(forecast, historical)
+
+    historical = historical.sort("time")
+
+    # print(historical.filter(pl.col("station_id") == 257))
+
+    ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
+    # this will assume 0 for values outside of the timeframe, and result will havelooked in the past.
+    # corrected later
+    historical_window_sum_missing_data = (
+        historical
+            .rolling("time", period=forecast_time_step, by="station_id", closed="left")
+            .agg(aggregation_op)
+    )
+
+    datapoints_to_drop = forecast_time_step/ACTUAL_TIME_STEP - 1
+
+    # drop first rows per group and adjust time so it fits forecasts
+    historical_window_sum = (
+        historical_window_sum_missing_data
+            # aggregate to drop data, we will explode afterwards.
+            # a waste of compute but only doubles total aggregations and should still be fast enough.
+            .group_by("station_id")
+            .agg(
+                ((
+                    pl.col("time").slice(datapoints_to_drop)
+                        # forecasts predict weather for the next time delta, aggregated accordingly.
+                        # since polars looks into the past we correct for that.
+                        - (forecast_time_step - ACTUAL_TIME_STEP)
+                    )
+                    # without this cast the datetime switches to microsecs
+                    .dt.cast_time_unit("ns")
+                ), 
+                col_to_aggregate.slice(datapoints_to_drop),
+                pl.col("time").first().alias("original_start_time"),
+            )
+            .explode(["time", "precipitation_real"])
+    )
+
+    # print(historical_window_sum)
+
+    # thats the pain with polars: trying to do anything but data wrangling is annoying.
+    # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
+    assert_correctness = historical_window_sum.group_by("station_id").agg((pl.col("time").first() == pl.col("original_start_time")).alias("correct_calc").all())
+
+    # print(assert_correctness)
+
+    assert assert_correctness.select(pl.col("correct_calc").all())["correct_calc"][0]
+
+    # historical.group_by(["station_id"]).agg(pl.col("time").rolling(period=datetime.timedelta(hours=3)).agg(pl.col("precipitation_real").sum()))
+
+    historical_window_sum = historical_window_sum.drop("original_start_time")
+
+    joined = forecast.join(historical_window_sum, on=["station_id", "time"], how="left")
+
+    # print(joined)
+
+    return joined.to_pandas()
 
 class Feature(Enum):
     """Listing of possible features to choose from"""
@@ -232,67 +304,33 @@ class DWD_Dataset:
     def _create_merge(
         self, forecast: pd.DataFrame, historical: pd.DataFrame
     ) -> pd.DataFrame:
-        forecast = forecast.copy()
-        historical = historical.copy()
-        if self._model == 1:
-            merge = pd.merge(
-                forecast, historical, on=["time", "station_id"], how="left"
-            )
-        # TODO: make this faster
-        elif self._model == 2:
-            # NOTE: assert that the forecast for self._model=2 is for every three hours
-            # therefor sum the historical data in buckets with a width of three hours
-            station_ids = forecast["station_id"].unique()
-            call_times = forecast["call_time"].unique()
-            for station_id, call_time in tqdm(list(itertools.product(station_ids, call_times)), desc="correct for 3h scope of model 2"):  # list for tqdm bar
-                sub_df_forecast = forecast[
-                    (forecast["call_time"] == call_time)
-                    & (forecast["station_id"] == station_id)
-                ]
-                forecast_times = sorted(sub_df_forecast["time"].unique())
-                min_time = datetime2timestamp_int(forecast_times[0])
-                max_time = datetime2timestamp_int(
-                    forecast_times[-1] + datetime.timedelta(hours=3)
+        timestep: datetime.timedelta
+        match self._model:
+            case 1:
+                timestep = datetime.timedelta(hours=1)
+            case 2:
+                timestep = datetime.timedelta(hours=3)
+            case _:
+                raise RuntimeError("unreachable")
+        match self._feature:
+            case Feature.PRECIPITATION:
+                merge = accumulate_and_merge_hist_forecast_window(
+                    forecast,
+                    historical,
+                    forecast_time_step=timestep,
+                    col_to_aggregate=pl.col("precipitation_real"), 
+                    aggregation_op=pl.col("precipitation_real").sum(),
                 )
-                buckets = np.array(
-                    [datetime2timestamp_int(dt) for dt in forecast_times]
+            case Feature.TEMPERATURE:
+                merge = accumulate_and_merge_hist_forecast_window(
+                    forecast,
+                    historical,
+                    forecast_time_step=timestep,
+                    col_to_aggregate=pl.col("air_temperature_real"),
+                    aggregation_op=pl.col("air_temperature_real").mean(),
                 )
-                # buckets = np.array([dt for dt in forecast_times])
-
-                sub_df_historical = historical[
-                    (historical["station_id"] == station_id)
-                    & (historical["time"].apply(datetime2timestamp_int) >= min_time)
-                    & (historical["time"].apply(datetime2timestamp_int) <= max_time)
-                ]
-                bucket_idx = np.digitize(
-                    sub_df_historical["time"].apply(datetime2timestamp_int), buckets
-                )
-                # correct index
-                bucket_idx -= 1
-                if self._feature == Feature.PRECIPITATION:
-                    operation = np.sum
-                elif self._feature == Feature.TEMPERATURE:
-                    operation = np.mean
-                else:
-                    operation = np.mean
-                    msg = f"No aggregation function implemented for feature: {self._feature}. Fall back to {operation}"
-                    logging.warning(msg)
-
-                
-                # sum the content of each bucket
-                accs = operate_on_same_index(
-                    sub_df_historical["precipitation_real"].values, bucket_idx, operation
-                )
-            
-                # replace values in historical
-                for time, value in zip(forecast_times, accs):
-                    historical.loc[(historical["time"] == time) & (historical["station_id"] == station_id), "precipitation_real"] = value
-                
-                merge = pd.merge(
-                    forecast, historical, on=["time", "station_id"], how="left"
-                )
-        else:
-            pass
+            case _:
+                raise RuntimeError("unimplemented")
 
         # add difference
         if self._feature is None:
