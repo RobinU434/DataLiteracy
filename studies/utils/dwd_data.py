@@ -264,9 +264,8 @@ class DWD_Dataset:
         )
 
         # if temperature do rescale
-        # if feature == Feature.TEMPERATURE or feature is  None:
-        #     print("correct temperature")
-        #     forecast[forecast_column_name] = (forecast[forecast_column_name] - 32) * 5 / 9
+        # if feature == Feature.TEMPERATURE or feature == Feature.ALL:
+        forecast[forecast_column_name] = forecast[forecast_column_name] / 10
 
         return forecast
 
