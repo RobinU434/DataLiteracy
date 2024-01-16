@@ -3437,6 +3437,24 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,<7.5)", "pytest-mock", "pytest-mypy-testing"]
 
 [[package]]
+name = "tueplots"
+version = "0.0.12"
+description = "Scientific plotting made easy"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "tueplots-0.0.12-py3-none-any.whl", hash = "sha256:02215e508aac992abf0dec2314532c6e7c5450e913fb5fd85ce46f99fbea5d1b"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+numpy = "*"
+
+[package.extras]
+ci = ["tox"]
+examples = ["jupyter"]
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.8.19.20240106"
 description = "Typing stubs for python-dateutil"
@@ -3576,4 +3594,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c1ef03f77acf6bbdcf6c7abd3853349828f46182abdee45ca25ca15fdd837780"
+content-hash = "99c226059a3cd3d365824a3abf0a07baf3cfe94e2655f68df79fb3c8593b0100"
