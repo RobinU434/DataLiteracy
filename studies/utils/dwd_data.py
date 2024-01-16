@@ -8,6 +8,7 @@ import datetime
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
 
+
 def accumulate_and_merge_hist_forecast_window(
     forecast: pd.DataFrame,
     historical: pd.DataFrame,
@@ -29,34 +30,33 @@ def accumulate_and_merge_hist_forecast_window(
     # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
 
     # corrected later
-    historical_window_sum_missing_data = (
-        historical
-            .rolling("time", period=forecast_time_step, by="station_id", closed="left")
-            .agg(aggregation_op)
-    )
+    historical_window_sum_missing_data = historical.rolling(
+        "time", period=forecast_time_step, by="station_id", closed="left"
+    ).agg(aggregation_op)
 
-    datapoints_to_drop = forecast_time_step/ACTUAL_TIME_STEP
+    datapoints_to_drop = forecast_time_step / ACTUAL_TIME_STEP
 
     # drop first rows per group and adjust time so it fits forecasts
     historical_window_sum = (
         historical_window_sum_missing_data
-            # aggregate to drop data, we will explode afterwards.
-            # a waste of compute but only doubles total aggregations and should still be fast enough.
-            .group_by("station_id")
-            .agg(
-                ((
+        # aggregate to drop data, we will explode afterwards.
+        # a waste of compute but only doubles total aggregations and should still be fast enough.
+        .group_by("station_id")
+        .agg(
+            (
+                (
                     pl.col("time").slice(datapoints_to_drop)
-                        # forecasts predict weather for the next time delta, aggregated accordingly.
-                        # since polars looks into the past we correct for that.
-                        - forecast_time_step
-                    )
-                    # without this cast the datetime switches to microsecs
-                    .dt.cast_time_unit("ns")
-                ), 
-                col_to_aggregate.slice(datapoints_to_drop),
-                pl.col("time").first().alias("original_start_time"),
-            )
-            .explode(["time", "precipitation_real"])
+                    # forecasts predict weather for the next time delta, aggregated accordingly.
+                    # since polars looks into the past we correct for that.
+                    - forecast_time_step
+                )
+                # without this cast the datetime switches to microsecs
+                .dt.cast_time_unit("ns")
+            ),
+            col_to_aggregate.slice(datapoints_to_drop),
+            pl.col("time").first().alias("original_start_time"),
+        )
+        .explode(["time", col_to_aggregate.meta.output_name()])
     )
 
     # print(historical_window_sum
@@ -66,7 +66,11 @@ def accumulate_and_merge_hist_forecast_window(
 
     # thats the pain with polars: trying to do anything but data wrangling is annoying.
     # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
-    assert_correctness = historical_window_sum.group_by("station_id").agg((pl.col("time").first() == pl.col("original_start_time")).alias("correct_calc").all())
+    assert_correctness = historical_window_sum.group_by("station_id").agg(
+        (pl.col("time").first() == pl.col("original_start_time"))
+        .alias("correct_calc")
+        .all()
+    )
 
     # print(assert_correctness)
 
@@ -78,9 +82,11 @@ def accumulate_and_merge_hist_forecast_window(
 
     return joined.to_pandas()
 
+
 class Feature(Enum):
     """Listing of possible features to choose from"""
 
+    ALL = 0
     PRECIPITATION = 1
     TEMPERATURE = 2
 
@@ -124,11 +130,11 @@ class DWD_Dataset:
             self._model = model
 
         self._source_path = source_path
-        self._feature = feature
+        self._feature = feature if feature is not None else Feature.ALL
         # load station meta information
         self._stations = pd.read_csv(self._source_path + "/stations.tsv", sep="\t")
 
-        if self._feature is None:
+        if self._feature == Feature.ALL:
             # load all specified features in Features enum
             precipitation_forecast = self._load_forecast(Feature.PRECIPITATION)
             temperature_forecast = self._load_forecast(Feature.TEMPERATURE)
@@ -167,8 +173,6 @@ class DWD_Dataset:
 
         # create a merge dataset where we link forecasts and recent data
         self._merge = self._create_merge(self._forecast, self._real_data)
-
-        # TODO: correct this. ASSIGNING 0 TO MEASUREMENT ERRORS IS PURELY WRONG
 
     def get_forecast(self, station_id: int = 0) -> pd.DataFrame:
         """get only forecast data
@@ -264,9 +268,9 @@ class DWD_Dataset:
         )
 
         # if temperature do rescale
-        # if feature == Feature.TEMPERATURE or feature is  None:
-        #     print("correct temperature")
-        #     forecast[forecast_column_name] = (forecast[forecast_column_name] - 32) * 5 / 9
+        # if feature == Feature.TEMPERATURE or feature == Feature.ALL:
+        forecast[forecast_column_name] = forecast[forecast_column_name] / 10
+
 
         return forecast
 
@@ -277,7 +281,9 @@ class DWD_Dataset:
             data_column_name,
             columns_to_drop,
         ) = RECENT_FEATURE_TRANSLATOR[feature]
-        precipitation = get_recent(feature=property_name, data_root_dir=f"{self._source_path}/recent")
+        precipitation = get_recent(
+            feature=property_name, data_root_dir=f"{self._source_path}/recent"
+        )
         # clean columns
         real_data = precipitation.drop(columns=columns_to_drop)
         # rename columns
@@ -306,13 +312,17 @@ class DWD_Dataset:
                 timestep = datetime.timedelta(hours=3)
             case _:
                 raise RuntimeError("unreachable")
+            
+        if self._model != 1 and (self._feature == Feature.ALL or self._feature == Feature.TEMPERATURE):
+            logging.warning("There is not forecast data for temperature at model = 2. You will find Nan")
+
         match self._feature:
             case Feature.PRECIPITATION:
                 merge = accumulate_and_merge_hist_forecast_window(
                     forecast,
                     historical,
                     forecast_time_step=timestep,
-                    col_to_aggregate=pl.col("precipitation_real"), 
+                    col_to_aggregate=pl.col("precipitation_real"),
                     aggregation_op=pl.col("precipitation_real").sum(),
                 )
             case Feature.TEMPERATURE:
@@ -323,22 +333,41 @@ class DWD_Dataset:
                     col_to_aggregate=pl.col("air_temperature_real"),
                     aggregation_op=pl.col("air_temperature_real").mean(),
                 )
-            case _:
-                raise RuntimeError("unimplemented")
+            case Feature.ALL:    
+                merge_precipitation = accumulate_and_merge_hist_forecast_window(
+                    forecast,
+                    historical,
+                    forecast_time_step=timestep,
+                    col_to_aggregate=pl.col("precipitation_real"),
+                    aggregation_op=pl.col("precipitation_real").sum(),
+                )
+                
+                merge_temperature = accumulate_and_merge_hist_forecast_window(
+                    forecast,
+                    historical,
+                    forecast_time_step=timestep,
+                    col_to_aggregate=pl.col("air_temperature_real"),
+                    aggregation_op=pl.col("air_temperature_real").mean(),
+                )
+                
+                merge = pd.merge(
+                    merge_precipitation,
+                    merge_temperature,
+                    how="left",
+                    on=["station_id", "call_time", "time", "air_temperature_forecast", "precipitation_forecast"],
+                )
 
         # add difference
-        if self._feature is None:
+        if self._feature == Feature.ALL:
             merge.insert(
                 len(merge.columns),
                 "precipitation_error",
-                merge["precipitation_forecast"]
-                - merge["precipitation_real"],
+                merge["precipitation_forecast"] - merge["precipitation_real"],
             )
             merge.insert(
                 len(merge.columns),
                 "air_temperature_error",
-                merge["air_temperature_forecast"]
-                - merge["air_temperature_real"],
+                merge["air_temperature_forecast"] - merge["air_temperature_real"],
             )
         elif isinstance(self._feature, Feature):
             name, _, _, _ = RECENT_FEATURE_TRANSLATOR[self._feature]
@@ -397,6 +426,7 @@ class DWD_Dataset:
 
         return df
 
+
 if __name__ == "__main__":
-    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
-    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)
+    DWD_Dataset(source_path="../../data/dwd", feature=Feature.PRECIPITATION, model=1)
+    DWD_Dataset(source_path="../../data/dwd", feature=Feature.PRECIPITATION, model=2)
