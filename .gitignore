@@ -160,7 +160,6 @@ cython_debug/
 #.idea/
 
 cypress_visitor
-data/dwd/raw
 
 lectures/
 data/dwd/correlated
