@@ -69,7 +69,7 @@ class DWDJsonConverter(Converter):
             # filter empty frames
             # frames = list(filter(lambda x: not x.empty, frames))
             filtered_dfs = list(filter(lambda x: not x.empty, frames))
-            
+
             if len(filtered_dfs) == 0:
                 result[feature_name] = frames[0]
             else:
