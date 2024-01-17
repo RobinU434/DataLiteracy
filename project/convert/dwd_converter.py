@@ -66,5 +66,13 @@ class DWDJsonConverter(Converter):
         result = {}
         for feature_name in self._features_of_interest:
             frames = [dfs[feature_name] for dfs in df_dicts]
-            result[feature_name] = pd.concat(frames)
+            # filter empty frames
+            # frames = list(filter(lambda x: not x.empty, frames))
+            filtered_dfs = list(filter(lambda x: not x.empty, frames))
+            
+            if len(filtered_dfs) == 0:
+                result[feature_name] = frames[0]
+            else:
+                concat_frames = pd.concat(filtered_dfs)
+                result[feature_name] = concat_frames
         return result
