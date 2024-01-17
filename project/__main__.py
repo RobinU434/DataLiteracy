@@ -31,6 +31,9 @@ def execute(args: dict) -> bool:
                 unpack=args["unpack"],
             )
 
+        case "convert-to-csv":
+            module.convert_to_csv(input=args["input"], output=args["output"])
+
         case _:
             return False
 

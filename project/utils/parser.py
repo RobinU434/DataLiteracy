@@ -1,6 +1,24 @@
 from argparse import ArgumentParser
 
 
+def add_convert_to_csv_args(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--input",
+        help='root folder of all forecast json files. Defaults to "data/dwd/json/raw',
+        dest="input",
+        type=str,
+        default="data/dwd/raw",
+    )
+    parser.add_argument(
+        "--output",
+        help='where to output the csv file structure. Defaults to "data/dwd/raw',
+        dest="output",
+        type=str,
+        default="data/dwd/csv",
+    )
+    return parser
+
+
 def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--station-ids",
@@ -63,7 +81,7 @@ def add_get_args(parser: ArgumentParser) -> ArgumentParser:
 def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--use-active-venv",
-        help="_description_",
+        help="set this flag if you have poetry installed and would like to run the analysis in with the active python env",
         dest="use_active_venv",
         type=bool,
         default="False",
@@ -116,6 +134,10 @@ def setup_dataprocess_parser(parser: ArgumentParser) -> ArgumentParser:
         help="get recent (precipitation, pressure, air temperature) data from the dwd database",
     )
     get_recent = add_get_recent_args(get_recent)
+    convert_to_csv = command_subparser.add_parser(
+        "convert-to-csv", help="convert the forecast data into csv format"
+    )
+    convert_to_csv = add_convert_to_csv_args(convert_to_csv)
     return parser
 
 
