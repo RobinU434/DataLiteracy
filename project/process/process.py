@@ -73,7 +73,7 @@ class DataProcess:
         """send request to every embedded crawler and return pandas data frame heads onto terminal
 
         Args:
-            save (bool, optional): _description_. Defaults to True.
+            save (bool, optional): if set to true save results. Defaults to True.
         """
         self._build_crawler()
         for crawler in self._crawler:
@@ -92,7 +92,7 @@ class DataProcess:
         Raises:
             NotImplementedError: _description_
         """
-        raise NotImplementedError
+        raise NotImplementedError("please implement this call your self. You can orientated the code at self.get_recent()")
 
     def get_recent(
         self,
