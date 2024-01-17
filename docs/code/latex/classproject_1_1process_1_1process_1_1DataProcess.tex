@@ -1,0 +1,133 @@
+\hypertarget{classproject_1_1process_1_1process_1_1DataProcess}{}\doxysection{project.\+process.\+process.\+Data\+Process Class Reference}
+\label{classproject_1_1process_1_1process_1_1DataProcess}\index{project.process.process.DataProcess@{project.process.process.DataProcess}}
+
+
+process for data literacy class  
+
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_a790f19754ab27491b978795ccd75cbc7}\label{classproject_1_1process_1_1process_1_1DataProcess_a790f19754ab27491b978795ccd75cbc7}} 
+None \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_a790f19754ab27491b978795ccd75cbc7}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self)
+\begin{DoxyCompactList}\small\item\em {\itshape summary} \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_ab4e346459c33c922b9e1b1f7a224f7ab}{start\+\_\+crawler}} (self, str crawler\+\_\+config\+\_\+path=\char`\"{}project/config/crawler.\+config.\+yaml\char`\"{})
+\begin{DoxyCompactList}\small\item\em start crawler to collect weather data from APIs specified in crawler config \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_a63289c20b61726fff7d68bcfe54a0a9c}{analyse}} (self, bool use\+\_\+active\+\_\+venv=False)
+\begin{DoxyCompactList}\small\item\em start pipeline to analyse data. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_a81e227d8ecf9ff6c1cfa04cce998a446}{get}} (self, bool save=True)
+\begin{DoxyCompactList}\small\item\em send request to every embedded crawler and return pandas data frame heads onto terminal \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_ad5e76bfc84d9d3c088020b4579165cfa}{get\+\_\+historical}} (self, List\mbox{[}int\mbox{]} station\+\_\+ids, str save\+\_\+path)
+\begin{DoxyCompactList}\small\item\em get historical (precipitation, pressure, air temperature) data from the dwd database \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_a8d285fe0a32d2b645a6027c3c8215171}{get\+\_\+recent}} (self, List\mbox{[}int\mbox{]} station\+\_\+ids, str save\+\_\+path, List\mbox{[}str\mbox{]} features, bool unpack=True)
+\begin{DoxyCompactList}\small\item\em get recent (precipitation, pressure, air temperature) data from the dwd database \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classproject_1_1process_1_1process_1_1DataProcess_a1b9af9bfa62549bbed2945689eb47960}{convert\+\_\+to\+\_\+csv}} (self, str input=\char`\"{}data/dwd/raw\char`\"{}, str output=\char`\"{}data/dwd/csv\char`\"{})
+\begin{DoxyCompactList}\small\item\em convert the forecast data into csv format \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+process for data literacy class 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_a63289c20b61726fff7d68bcfe54a0a9c}\label{classproject_1_1process_1_1process_1_1DataProcess_a63289c20b61726fff7d68bcfe54a0a9c}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!analyse@{analyse}}
+\index{analyse@{analyse}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{analyse()}{analyse()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+analyse (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{bool }]{use\+\_\+active\+\_\+venv = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+start pipeline to analyse data. 
+
+\begin{DoxyVerb}        use_active_venv (bool, optional): set this flag if you have poetry installed and would like to run the analysis in with the active python env
+\end{DoxyVerb}
+ \mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_a1b9af9bfa62549bbed2945689eb47960}\label{classproject_1_1process_1_1process_1_1DataProcess_a1b9af9bfa62549bbed2945689eb47960}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!convert\_to\_csv@{convert\_to\_csv}}
+\index{convert\_to\_csv@{convert\_to\_csv}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{convert\_to\_csv()}{convert\_to\_csv()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+convert\+\_\+to\+\_\+csv (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{str }]{input = {\ttfamily \char`\"{}data/dwd/raw\char`\"{}},  }\item[{str }]{output = {\ttfamily \char`\"{}data/dwd/csv\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+convert the forecast data into csv format 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & root folder of all forecast json files. Defaults to \char`\"{}data/dwd/json/raw @param output  where to output the csv file structure. Defaults to \char`\"{}data/dwd/raw \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_a81e227d8ecf9ff6c1cfa04cce998a446}\label{classproject_1_1process_1_1process_1_1DataProcess_a81e227d8ecf9ff6c1cfa04cce998a446}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!get@{get}}
+\index{get@{get}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{bool }]{save = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+send request to every embedded crawler and return pandas data frame heads onto terminal 
+
+\begin{DoxyVerb}        save (bool, optional): if set to true save results. Defaults to True.
+\end{DoxyVerb}
+ \mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_ad5e76bfc84d9d3c088020b4579165cfa}\label{classproject_1_1process_1_1process_1_1DataProcess_ad5e76bfc84d9d3c088020b4579165cfa}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!get\_historical@{get\_historical}}
+\index{get\_historical@{get\_historical}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{get\_historical()}{get\_historical()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+get\+\_\+historical (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{List\mbox{[}int\mbox{]}}]{station\+\_\+ids,  }\item[{str}]{save\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+get historical (precipitation, pressure, air temperature) data from the dwd database 
+
+
+\begin{DoxyParams}{Parameters}
+{\em station\+\_\+ids} & {\itshape description} \\
+\hline
+{\em save\+\_\+path} & {\itshape description}\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Not\+Implemented\+Error} & {\itshape description} \\
+\hline
+\end{DoxyExceptions}
+\mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_a8d285fe0a32d2b645a6027c3c8215171}\label{classproject_1_1process_1_1process_1_1DataProcess_a8d285fe0a32d2b645a6027c3c8215171}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!get\_recent@{get\_recent}}
+\index{get\_recent@{get\_recent}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{get\_recent()}{get\_recent()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+get\+\_\+recent (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{List\mbox{[}int\mbox{]}}]{station\+\_\+ids,  }\item[{str}]{save\+\_\+path,  }\item[{List\mbox{[}str\mbox{]}}]{features,  }\item[{bool }]{unpack = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+get recent (precipitation, pressure, air temperature) data from the dwd database 
+
+
+\begin{DoxyParams}{Parameters}
+{\em station\+\_\+ids} & station ids from DWD \\
+\hline
+{\em save\+\_\+path} & where you want to store the collected information. It will create this directory if it does not exist already. \\
+\hline
+{\em unpack} & if set to true we will also unpack the downloaded zips \\
+\hline
+{\em features} & features you want to extract from DWD API \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classproject_1_1process_1_1process_1_1DataProcess_ab4e346459c33c922b9e1b1f7a224f7ab}\label{classproject_1_1process_1_1process_1_1DataProcess_ab4e346459c33c922b9e1b1f7a224f7ab}} 
+\index{project.process.process.DataProcess@{project.process.process.DataProcess}!start\_crawler@{start\_crawler}}
+\index{start\_crawler@{start\_crawler}!project.process.process.DataProcess@{project.process.process.DataProcess}}
+\doxysubsubsection{\texorpdfstring{start\_crawler()}{start\_crawler()}}
+{\footnotesize\ttfamily def project.\+process.\+process.\+Data\+Process.\+start\+\_\+crawler (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{str }]{crawler\+\_\+config\+\_\+path = {\ttfamily \char`\"{}project/config/crawler.config.yaml\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+start crawler to collect weather data from APIs specified in crawler config 
+
+
+\begin{DoxyParams}{Parameters}
+{\em crawler\+\_\+config\+\_\+path} & crawler config for individual apis \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+docs/code/tmp/project/process/process.\+py\end{DoxyCompactItemize}
