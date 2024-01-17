@@ -184,7 +184,7 @@ class DWD_Dataset:
             pd.DataFrame: processed forecast DataFrame
         """
         forecast = self._filter_df(df=self._forecast, station_id=station_id)
-        return forecast
+        return forecast.copy()
 
     def get_merge(self, station_id: int = 0) -> pd.DataFrame:
         """get merge data with forecast and historical data
@@ -196,7 +196,7 @@ class DWD_Dataset:
             pd.DataFrame: processed DataFrame with forecast and historical data inside
         """
         merge = self._filter_df(df=self._merge, station_id=station_id)
-        return merge
+        return merge.copy()
 
     def get_historical(self, station_id: int = 0) -> pd.DataFrame:
         """get only forecast data
@@ -208,7 +208,7 @@ class DWD_Dataset:
             pd.DataFrame: processed forecast DataFrame
         """
         real_data = self._filter_df(df=self._real_data, station_id=station_id)
-        return real_data
+        return real_data.copy()
 
     def get_matrix(self, data_column: str):
         """shape: (num_api_calls, num_stations, num_predictions_into_future)
@@ -425,6 +425,17 @@ class DWD_Dataset:
             df = df.drop(columns=["provider"])
 
         return df
+    
+    @property
+    def station_meta(self) -> pd.DataFrame:
+        """returns all active stations we are accessing through forecasts
+
+        Returns:
+            pd.DataFrame: _description_
+        """
+        active_stations = self._merge["station_id"].unique()
+        filtered_stations = self._stations[self._stations["Stations_ID"].isin(active_stations) & self._stations["Kennung"] == "MN"].copy()
+        return filtered_stations
 
 
 if __name__ == "__main__":
