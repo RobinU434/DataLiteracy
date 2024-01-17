@@ -160,8 +160,10 @@ cython_debug/
 #.idea/
 
 cypress_visitor
-project/data/*/*/*.json
+data/dwd/raw
 
 lectures/
-data/
+data/dwd/correlated
+data/dwd/recent
+
 exam_preparation/
