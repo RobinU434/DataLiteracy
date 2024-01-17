@@ -6,9 +6,6 @@ from project.utils.parser import setup_parser
 def execute(args: dict) -> bool:
     module = DataProcess()
     match args["command"]:
-        case "build-db":
-            module.build_db()
-
         case "start-crawler":
             module.start_crawler(crawler_config_path=args["crawler_config_path"])
 

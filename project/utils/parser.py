@@ -100,16 +100,8 @@ def add_start_crawler_args(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def add_build_db_args(parser: ArgumentParser) -> ArgumentParser:
-    return parser
-
-
 def setup_dataprocess_parser(parser: ArgumentParser) -> ArgumentParser:
     command_subparser = parser.add_subparsers(dest="command", title="command")
-    build_db = command_subparser.add_parser(
-        "build-db", help="generate table in SQL data base"
-    )
-    build_db = add_build_db_args(build_db)
     start_crawler = command_subparser.add_parser(
         "start-crawler",
         help="start crawler to collect weather data from APIs specified in crawler config",

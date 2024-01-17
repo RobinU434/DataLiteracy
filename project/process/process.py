@@ -12,7 +12,6 @@ from project.convert.dwd_converter import DWDJsonConverter
 from project.convert.utils import insert_column
 from project.crawler.base import BaseCrawler
 from project.crawler.manager import CrawlerManager
-from project.database.database import Database
 from project.process.utils.download_dwd_data import (
     build_recent_url,
     check_station_ids,
@@ -31,15 +30,6 @@ class DataProcess:
     def __init__(self) -> None:
         """_summary_"""
 
-        self._db = Database(
-            user_name="root",
-            password="example",
-            db_name="WeatherData",
-            host_ip="172.19.0.4",
-            # host_ip="mariadb.data_literacy_network",
-            port=3306,
-        )
-
         self._crawler: List[BaseCrawler]
 
     def _build_crawler(
@@ -50,10 +40,6 @@ class DataProcess:
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
             self._crawler.append(crawler_class(**crawler_config))
-
-    def build_db(self):
-        """generate table in SQL data base"""
-        self._db.build_tables()
 
     def start_crawler(
         self, crawler_config_path: str = "project/config/crawler.config.yaml"
