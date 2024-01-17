@@ -1,26 +1,26 @@
 import datetime
 import glob
 import os
+from os import makedirs
 from typing import List
+
+from tqdm import tqdm
+
+import project.crawler as crawler
 from project.analysis.pipeline import JupyterPipeline
 from project.convert.dwd_converter import DWDJsonConverter
 from project.convert.utils import insert_column
-from project.process.utils.unpack_zip import unzip
-
-import wget
 from project.crawler.base import BaseCrawler
-import project.crawler as crawler
 from project.crawler.manager import CrawlerManager
 from project.database.database import Database
 from project.process.utils.download_dwd_data import (
     build_recent_url,
-    filter_features,
     check_station_ids,
+    filter_features,
 )
+from project.process.utils.unpack_zip import unzip
 from project.utils.download import get_zips
 from project.utils.file_system import load_json, load_yaml
-from tqdm import tqdm
-from os import makedirs
 
 
 class DataProcess:
@@ -160,10 +160,10 @@ class DataProcess:
             output (str): where to output the csv file structure. Defaults to "data/dwd/raw
         """
         input = input.rstrip("/")
-        output = output.rstrip("/")
+        output = output.rstrip("/") + "/"
 
         converter = DWDJsonConverter()
-        for file_name in glob.glob(input + "/*.json"):
+        for file_name in tqdm(glob.glob(input + "/*.json"), desc="processing files"):
             call_time_utc = int(file_name.split("/")[-1].split(".")[0])
             data = load_json(file_name)
 
@@ -173,8 +173,7 @@ class DataProcess:
                 column_name="call_time",
                 value=datetime.datetime.utcfromtimestamp(call_time_utc),
             )
-            write_base_path = "../data/dwd/csv/"
-            os.makedirs(write_base_path + str(call_time_utc))
+            os.makedirs(output + str(call_time_utc))
 
             for key, df in filter(lambda x: bool(len(x[1])), dfs.items()):
-                df.to_csv(write_base_path + str(call_time_utc) + "/" + key + ".csv")
+                df.to_csv(output + str(call_time_utc) + "/" + key + ".csv")
