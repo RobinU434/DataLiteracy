@@ -96,7 +96,18 @@ The content of `project`:
 └── utils           # general tooling used by all components: interaction to filesystem, ...
 ```
 
+## Data
 
+as previously meantioned we collected forecast data from 36 station accross the state of Baden-Württemberg. 
+![station](./figures/BaWu_stations_map.jpg)
+
+The forecast we received from the `StationOverview` interface is documented at: https://dwd.api.bund.dev/.  
+Note: If you try it you self you will experience precipitation and temperature forecast as integers. To successfully use them in comparison to the historical or recent data you have to divide at least those values by 10.  
+
+We highly encourage all readers to conduct their own experiments on the collected data but also verify our results.  
+If you have any doubts please add an issue at the corresponding GitHub repository. We will get back to you as soon as possible.
+
+In case you build upon our repository or parts of the codebase we kindly ask to mention us in your work and refer to the original authors of this repository. 
 
 ## Acknowledgments
 
