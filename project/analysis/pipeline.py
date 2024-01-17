@@ -1,4 +1,3 @@
-
 import logging
 import subprocess
 from collections.abc import Callable
@@ -8,20 +7,26 @@ from project.utils.thread import SpinnerThread, ThreadWithReturnValue
 
 
 class JupyterPipeline:
-    def __init__(self, use_active_venv: bool = False, note_book_listing_path: str = "project/config/analysation_scripts.yaml") -> None:
+    def __init__(
+        self,
+        use_active_venv: bool = False,
+        note_book_listing_path: str = "project/config/analysation_scripts.yaml",
+    ) -> None:
         self._use_active_venv = use_active_venv
         self._notebook_paths = load_yaml(note_book_listing_path)
 
     def run(self):
         """Start pipeline"""
-        poetry_prefix = 'poetry run ' if not self._use_active_venv else ''
-        
+        poetry_prefix = "poetry run " if not self._use_active_venv else ""
+
         # load scripts to execute
         for notebook in self._notebook_paths:
             print("[NbClientApp] Executing ", notebook)
             cmd = f"{poetry_prefix}jupyter execute --allow-errors {notebook}"
 
-            jupyter_thread = ThreadWithReturnValue(target=self._create_subprocess_func(cmd))
+            jupyter_thread = ThreadWithReturnValue(
+                target=self._create_subprocess_func(cmd)
+            )
             jupyter_thread.start()
 
             spinner_thread = SpinnerThread()
@@ -31,7 +36,7 @@ class JupyterPipeline:
             spinner_thread.stop()
 
             stderr = result.stderr.decode("utf-8")
-            
+
             if "FileNotFoundError:" in stderr:
                 msg = f"No such file or directory: '{notebook}'"
                 logging.error(msg)
@@ -55,7 +60,9 @@ class JupyterPipeline:
 
     def _create_subprocess_func(self, command: str) -> Callable:
         def inner() -> object:
-            result = subprocess.run(command, shell=True, capture_output=True, check=False)
+            result = subprocess.run(
+                command, shell=True, capture_output=True, check=False
+            )
             return result
-        
+
         return inner
