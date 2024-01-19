@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from typing import List
 import numpy as np
 import pandas as pd
 import polars as pl
@@ -174,40 +175,48 @@ class DWD_Dataset:
         # create a merge dataset where we link forecasts and recent data
         self._merge = self._create_merge(self._forecast, self._real_data)
 
-    def get_forecast(self, station_id: int = 0) -> pd.DataFrame:
+    def get_forecast(self, station_id: int = 0, columns: List[str] = []) -> pd.DataFrame:
         """get only forecast data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
+            columns (List[str], optional): which columns do you want to select?. [] -> all columns. Defaults to []
 
         Returns:
             pd.DataFrame: processed forecast DataFrame
         """
-        forecast = self._filter_df(df=self._forecast, station_id=station_id)
+        forecast = self._forecast.copy()
+        forecast = self._filter_df(df=forecast, station_id=station_id)
+        forecast = self._get_columns(df=forecast, columns=columns)
         return forecast.copy()
 
-    def get_merge(self, station_id: int = 0) -> pd.DataFrame:
+    def get_merge(self, station_id: int = 0, columns: List[str] = []) -> pd.DataFrame:
         """get merge data with forecast and historical data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
+            columns (List[str], optional): which columns do you want to select?. [] -> all columns. Defaults to []
 
         Returns:
             pd.DataFrame: processed DataFrame with forecast and historical data inside
         """
-        merge = self._filter_df(df=self._merge, station_id=station_id)
+        merge = self._merge.copy()
+        merge = self._filter_df(df=merge, station_id=station_id)
+        merge = self._get_columns(df=self._merge, columns=columns)
         return merge.copy()
 
-    def get_historical(self, station_id: int = 0) -> pd.DataFrame:
+    def get_historical(self, station_id: int = 0, columns: List[str] = []) -> pd.DataFrame:
         """get only forecast data
 
         Args:
             station_id (int, optional): from which data. If set to 0 -> all stations. Defaults to 0.
-
+            columns (List[str], optional): which columns do you want to select?. [] -> all columns. Defaults to []
         Returns:
             pd.DataFrame: processed forecast DataFrame
         """
-        real_data = self._filter_df(df=self._real_data, station_id=station_id)
+        real_data = self._real_data.copy()
+        real_data = self._filter_df(df=real_data, station_id=station_id)
+        real_data = self._get_columns(df=real_data, columns=columns)
         return real_data.copy()
 
     def get_matrix(self, data_column: str):
@@ -405,6 +414,14 @@ class DWD_Dataset:
         self._forecast = self._forecast[mask]
         self._real_data = self._real_data[mask]
         self._merge = self._merge[mask]
+
+    @staticmethod
+    def _get_columns(df, columns: List[str] = []) -> pd.DataFrame:
+        if len(columns) == 0:
+            return df
+        
+        sub_df = df[columns]
+        return sub_df
 
     def __str__(self) -> str:
         return str(self._merge)
