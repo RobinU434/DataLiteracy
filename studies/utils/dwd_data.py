@@ -202,7 +202,7 @@ class DWD_Dataset:
         """
         merge = self._merge.copy()
         merge = self._filter_df(df=merge, station_id=station_id)
-        merge = self._get_columns(df=self._merge, columns=columns)
+        merge = self._get_columns(df=merge, columns=columns)
         return merge.copy()
 
     def get_historical(self, station_id: int = 0, columns: List[str] = []) -> pd.DataFrame:
