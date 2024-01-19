@@ -163,7 +163,7 @@ class DataProcess:
             result = input(
                 f"There are already multiple csv files in {output_dir}. Would you like to overwrite them? [Y, n]: "
             )
-            force = True if result.lower() in ["","y", "yes"] else False
+            force = result.lower() in ["","y", "yes"]
 
         csv_folder = glob.glob(output_dir + "*")
         csv_folder_time_stamps = list(map(lambda x: int(x.split("/")[-1]), csv_folder))
