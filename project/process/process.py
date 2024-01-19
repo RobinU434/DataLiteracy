@@ -174,6 +174,10 @@ class DataProcess:
         # if os.path.exists(output):
         #     rmtree(output)
 
+        # check for existing output directory
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+
         converter = DWDJsonConverter()
         for file_name in tqdm(
             glob.glob(input_dir + "/*.json"), desc="processing files"
