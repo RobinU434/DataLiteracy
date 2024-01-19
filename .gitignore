@@ -160,5 +160,8 @@ cython_debug/
 #.idea/
 
 lectures/
+data/dwd/correlated
+data/dwd/recent
+data/dwd/csv/*/*.csv
 
 exam_preparation/
