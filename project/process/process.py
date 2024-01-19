@@ -3,6 +3,7 @@ import glob
 import os
 from os import makedirs
 from typing import List
+from shutil import rmtree
 
 from tqdm import tqdm
 
@@ -147,6 +148,10 @@ class DataProcess:
         """
         input = input.rstrip("/")
         output = output.rstrip("/") + "/"
+
+        # ensure a clean output directory
+        if os.path.exists(output):
+            rmtree(output)
 
         converter = DWDJsonConverter()
         for file_name in tqdm(glob.glob(input + "/*.json"), desc="processing files"):
