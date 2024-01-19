@@ -29,7 +29,11 @@ def execute(args: dict) -> bool:
             )
 
         case "convert-to-csv":
-            module.convert_to_csv(input=args["input"], output=args["output"])
+            module.convert_to_csv(
+                input_dir=args["input_dir"],
+                output_dir=args["output_dir"],
+                force=args["force"],
+            )
 
         case _:
             return False

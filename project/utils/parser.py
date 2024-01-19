@@ -3,18 +3,25 @@ from argparse import ArgumentParser
 
 def add_convert_to_csv_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
-        "--input",
+        "--input-dir",
         help='root folder of all forecast json files. Defaults to "data/dwd/json/raw',
-        dest="input",
+        dest="input_dir",
         type=str,
         default="data/dwd/raw",
     )
     parser.add_argument(
-        "--output",
-        help='where to output the csv file structure. Defaults to "data/dwd/raw',
-        dest="output",
+        "--output-dir",
+        help='where to output_dir the csv file structure. Defaults to "data/dwd/raw',
+        dest="output_dir",
         type=str,
         default="data/dwd/csv",
+    )
+    parser.add_argument(
+        "--force",
+        help="force overwrite the existing files. Defaults to False",
+        dest="force",
+        action="store_true",
+        default=False,
     )
     return parser
 
@@ -44,7 +51,7 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
         "--unpack",
         help="features you want to extract from DWD API",
         dest="unpack",
-        type=bool,
+        action="store_true",
         default="True",
     )
     return parser
@@ -70,9 +77,9 @@ def add_get_historical_args(parser: ArgumentParser) -> ArgumentParser:
 def add_get_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--save",
-        help="_description_. Defaults to True.",
+        help="if set to true save results. Defaults to True.",
         dest="save",
-        type=bool,
+        action="store_true",
         default="True",
     )
     return parser
@@ -83,7 +90,7 @@ def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
         "--use-active-venv",
         help="set this flag if you have poetry installed and would like to run the analysis in with the active python env",
         dest="use_active_venv",
-        type=bool,
+        action="store_true",
         default="False",
     )
     return parser

@@ -93,7 +93,9 @@ class DataProcess:
         Raises:
             NotImplementedError: _description_
         """
-        raise NotImplementedError("please implement this call your self. You can orientated the code at self.get_recent()")
+        raise NotImplementedError(
+            "please implement this call your self. You can orientated the code at self.get_recent()"
+        )
 
     def get_recent(
         self,
@@ -128,10 +130,10 @@ class DataProcess:
             for feature in features:
                 url = build_recent_url(feature, station_id)
                 file_name = get_zips(url, save_path)
-                if len(file_name):
+                if len(file_name) > 0:
                     file_names.append(file_name)
 
-            if len(file_name):
+            if len(file_name) > 0:
                 success_counter += 1
 
         print(f"({success_counter}/{len(station_ids)}) where successful.")
@@ -139,22 +141,43 @@ class DataProcess:
         if unpack:
             unzip(*file_names)
 
-    def convert_to_csv(self, input: str = "data/dwd/raw", output: str = "data/dwd/csv"):
+    def convert_to_csv(
+        self,
+        input_dir: str = "data/dwd/raw",
+        output_dir: str = "data/dwd/csv",
+        force: bool = False,
+    ):
         """convert the forecast data into csv format
 
         Args:
-            input (str): root folder of all forecast json files. Defaults to "data/dwd/json/raw
-            output (str): where to output the csv file structure. Defaults to "data/dwd/raw
+            input_dir (str): root folder of all forecast json files. Defaults to "data/dwd/json/raw
+            output_dir (str): where to output_dir the csv file structure. Defaults to "data/dwd/raw
+            force (bool): force overwrite the existing files. Defaults to False
         """
-        input = input.rstrip("/")
-        output = output.rstrip("/") + "/"
+        input_dir = input_dir.rstrip("/")
+        output_dir = output_dir.rstrip("/") + "/"
+
+        # check for existing csv files
+        csv_files = glob.glob(output_dir + "*/*.csv")
+        if len(csv_files) > 0 and not force:
+            result = input(
+                f"There are already multiple csv files in {output_dir}. Would you like to overwrite them? [Y, n]: "
+            )
+            force = True if result.lower() in ["","y", "yes"] else False
+
+        csv_folder = glob.glob(output_dir + "*")
+        csv_folder_time_stamps = list(map(lambda x: int(x.split("/")[-1]), csv_folder))
+
+        stats = {"overwrite": 0, "skip": 0, "new": 0}
 
         # ensure a clean output directory
         # if os.path.exists(output):
         #     rmtree(output)
 
         converter = DWDJsonConverter()
-        for file_name in tqdm(glob.glob(input + "/*.json"), desc="processing files"):
+        for file_name in tqdm(
+            glob.glob(input_dir + "/*.json"), desc="processing files"
+        ):
             call_time_utc = int(file_name.split("/")[-1].split(".")[0])
             data = load_json(file_name)
 
@@ -164,7 +187,25 @@ class DataProcess:
                 column_name="call_time",
                 value=datetime.datetime.utcfromtimestamp(call_time_utc),
             )
-            os.makedirs(output + str(call_time_utc))
+
+            if call_time_utc not in csv_folder_time_stamps:
+                os.makedirs(output_dir + str(call_time_utc))
 
             for key, df in filter(lambda x: bool(len(x[1])), dfs.items()):
-                df.to_csv(output + str(call_time_utc) + "/" + key + ".csv")
+                path = output_dir + str(call_time_utc) + "/" + key + ".csv"
+                file_exists = path in csv_files
+                if file_exists and force:
+                    # overwrite the file
+                    stats["overwrite"] += 1
+                    os.remove(path)
+                    df.to_csv(path)
+                    continue
+                if file_exists and not force:
+                    stats["skip"] += 1
+                    continue
+                
+                stats["new"] += 1
+                df.to_csv(path)
+
+        print("stats: ", stats)
+                
