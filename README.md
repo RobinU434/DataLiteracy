@@ -50,7 +50,7 @@ We provide collected forecast data on Git LFS. Therefore you should already have
 
 ## Do Analysis
 
-As mentioned before our analysis is based on calculations done in Jupyter-Notebooks. To start every Notebook incorporated in the final report please start the analysis with.
+The analysis is based on calculations done in Jupyter-Notebooks. To start every Notebook incorporated in the final report please start the analysis with.
 ```bash
 python -m project analyse
 ```
