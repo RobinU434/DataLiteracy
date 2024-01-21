@@ -38,7 +38,7 @@ We provide collected forecast data on Git LFS. Therefore you should already have
 
 1. **Download historical data**: To asses the quality of a forecast model you have to download the historical data. Because this research project was conducted in Germany we use the historical and recent data from the DWD. To download each dataset respectively execute in project root:
     ```bash
-    python -m project get-recent --station-ids 257 4189 13965 755 757 5688 1197 1214 1224 1255 1239 6258 1584 6259 2074 7331 2575 2814 259 3402 5562 6275 3734 1602 3925 3927 4160 4169 4300 4349 6262 4703 6263 5229 4094 5664 5731 --save-path data/dwd/recent/ --features precipitation  air_temperature
+    python -m project get-recent --station-ids 257 4189 13965 755 757 5688 1197 1214 1224 1255 6258 1584 6259 2074 7331 2575 2814 259 3402 5562 6275 3734 1602 3925 3927 4160 4169 4300 4349 6262 4703 6263 5229 4094 5664 5731 --save-path data/dwd/recent/ --features precipitation  air_temperature
     ```
     This will download the recent data (form the last 6 months) into `data/dwd/recent`.  
     If your forecast data is older than 6 months you have to execute the same command but instead of using `get-recent` type `get-historical` (Note: Not tested yet).
