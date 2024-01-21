@@ -28,14 +28,14 @@ def accumulate_and_merge_hist_forecast_window(
     # )
 
     ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
-    # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
 
+    # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
     # corrected later
     historical_window_sum_missing_data = historical.rolling(
         "time", period=forecast_time_step, by="station_id", closed="left"
     ).agg(aggregation_op)
 
-    datapoints_to_drop = forecast_time_step / ACTUAL_TIME_STEP
+    datapoints_to_drop = int(forecast_time_step / ACTUAL_TIME_STEP - 1)
 
     # drop first rows per group and adjust time so it fits forecasts
     historical_window_sum = (
@@ -49,7 +49,7 @@ def accumulate_and_merge_hist_forecast_window(
                     pl.col("time").slice(datapoints_to_drop)
                     # forecasts predict weather for the next time delta, aggregated accordingly.
                     # since polars looks into the past we correct for that.
-                    - forecast_time_step
+                    - (forecast_time_step - ACTUAL_TIME_STEP)
                 )
                 # without this cast the datetime switches to microsecs
                 .dt.cast_time_unit("ns")
@@ -57,7 +57,7 @@ def accumulate_and_merge_hist_forecast_window(
             col_to_aggregate.slice(datapoints_to_drop),
             pl.col("time").first().alias("original_start_time"),
         )
-        .explode(["time", col_to_aggregate.meta.output_name()])
+        .explode([pl.col("time"), col_to_aggregate])
     )
 
     # print(historical_window_sum
@@ -72,8 +72,6 @@ def accumulate_and_merge_hist_forecast_window(
         .alias("correct_calc")
         .all()
     )
-
-    # print(assert_correctness)
 
     assert assert_correctness.select(pl.col("correct_calc").all())["correct_calc"][0]
 
@@ -456,5 +454,5 @@ class DWD_Dataset:
 
 
 if __name__ == "__main__":
-    DWD_Dataset(source_path="../../data/dwd", feature=Feature.PRECIPITATION, model=1)
-    DWD_Dataset(source_path="../../data/dwd", feature=Feature.PRECIPITATION, model=2)
+    # DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
+    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)

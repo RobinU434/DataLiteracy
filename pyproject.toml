@@ -43,7 +43,7 @@ sqlalchemy = "^2.0.23"
 
 
 [tool.poetry.group.sam_explore.dependencies]
-polars = "^0.20.1"
+polars = "^0.20.4"
 geopy = "^2.4.1"
 
 
