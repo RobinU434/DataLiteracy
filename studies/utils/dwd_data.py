@@ -8,18 +8,17 @@ import datetime
 
 from studies.utils.forecast import get_dwd_forecast, set_errors_to_zeros
 from studies.utils.recent import get_recent
+from typing import Iterable
 
-
-def accumulate_and_merge_hist_forecast_window(
-    forecast: pd.DataFrame,
-    historical: pd.DataFrame,
-    forecast_time_step: datetime.timedelta,
+def accumulate_timeseries(
+    historical: pl.DataFrame,
+    accumulate_time_step: datetime.timedelta,
+    actual_time_step: datetime.timedelta,
     col_to_aggregate: pl.functions.col,
     aggregation_op: pl.Expr,
-) -> pd.DataFrame:
-    forecast = pl.from_pandas(forecast)
-    historical = pl.from_pandas(historical)
-
+    grouped_by: pl.Expr | Iterable[pl.Expr] = pl.col("station_id"),
+):
+    "this has all kinds of horrible naming, but I cant spend time properly naming everything in here. So be warned."
     historical = historical.sort("time")
 
     # print(historical
@@ -27,29 +26,27 @@ def accumulate_and_merge_hist_forecast_window(
     #     .filter(pl.col("time") > datetime.datetime.fromisoformat("2023-12-08 04:00:00"))
     # )
 
-    ACTUAL_TIME_STEP = datetime.timedelta(hours=1)
-
     # this will assume 0 for values outside of the timeframe, and the time will be at the end of the accumulation window
     # corrected later
     historical_window_sum_missing_data = historical.rolling(
-        "time", period=forecast_time_step, by="station_id", closed="left"
+        "time", period=accumulate_time_step, by=grouped_by, closed="left"
     ).agg(aggregation_op)
 
-    datapoints_to_drop = int(forecast_time_step / ACTUAL_TIME_STEP - 1)
+    datapoints_to_drop = int(accumulate_time_step / actual_time_step - 1)
 
     # drop first rows per group and adjust time so it fits forecasts
     historical_window_sum = (
         historical_window_sum_missing_data
         # aggregate to drop data, we will explode afterwards.
         # a waste of compute but only doubles total aggregations and should still be fast enough.
-        .group_by("station_id")
+        .group_by(grouped_by)
         .agg(
             (
                 (
                     pl.col("time").slice(datapoints_to_drop)
                     # forecasts predict weather for the next time delta, aggregated accordingly.
                     # since polars looks into the past we correct for that.
-                    - (forecast_time_step - ACTUAL_TIME_STEP)
+                    - (accumulate_time_step - actual_time_step)
                 )
                 # without this cast the datetime switches to microsecs
                 .dt.cast_time_unit("ns")
@@ -67,7 +64,7 @@ def accumulate_and_merge_hist_forecast_window(
 
     # thats the pain with polars: trying to do anything but data wrangling is annoying.
     # amongst these is asserting correct data comes in, which has to be rephrased in terms of data conversions.
-    assert_correctness = historical_window_sum.group_by("station_id").agg(
+    assert_correctness = historical_window_sum.group_by(grouped_by).agg(
         (pl.col("time").first() == pl.col("original_start_time"))
         .alias("correct_calc")
         .all()
@@ -76,6 +73,28 @@ def accumulate_and_merge_hist_forecast_window(
     assert assert_correctness.select(pl.col("correct_calc").all())["correct_calc"][0]
 
     historical_window_sum = historical_window_sum.drop("original_start_time")
+
+    return historical_window_sum
+
+def accumulate_and_merge_different_timeseries_periodes(
+    forecast: pd.DataFrame,
+    historical: pd.DataFrame,
+    forecast_time_step: datetime.timedelta,
+    col_to_aggregate: pl.functions.col,
+    aggregation_op: pl.Expr,
+) -> pd.DataFrame:
+    forecast = pl.from_pandas(forecast)
+    historical = pl.from_pandas(historical)
+
+    actual_time_step = datetime.timedelta(hours=1)
+
+    historical_window_sum = accumulate_timeseries(
+        historical,
+        forecast_time_step,
+        actual_time_step,
+        col_to_aggregate,
+        aggregation_op
+    )
 
     joined = forecast.join(historical_window_sum, on=["station_id", "time"], how="left")
 
@@ -327,7 +346,7 @@ class DWD_Dataset:
 
         match self._feature:
             case Feature.PRECIPITATION:
-                merge = accumulate_and_merge_hist_forecast_window(
+                merge = accumulate_and_merge_different_timeseries_periodes(
                     forecast,
                     historical,
                     forecast_time_step=timestep,
@@ -335,7 +354,7 @@ class DWD_Dataset:
                     aggregation_op=pl.col("precipitation_real").sum(),
                 )
             case Feature.TEMPERATURE:
-                merge = accumulate_and_merge_hist_forecast_window(
+                merge = accumulate_and_merge_different_timeseries_periodes(
                     forecast,
                     historical,
                     forecast_time_step=timestep,
@@ -343,7 +362,7 @@ class DWD_Dataset:
                     aggregation_op=pl.col("air_temperature_real").mean(),
                 )
             case Feature.ALL:    
-                merge_precipitation = accumulate_and_merge_hist_forecast_window(
+                merge_precipitation = accumulate_and_merge_different_timeseries_periodes(
                     forecast,
                     historical,
                     forecast_time_step=timestep,
@@ -351,7 +370,7 @@ class DWD_Dataset:
                     aggregation_op=pl.col("precipitation_real").sum(),
                 )
                 
-                merge_temperature = accumulate_and_merge_hist_forecast_window(
+                merge_temperature = accumulate_and_merge_different_timeseries_periodes(
                     forecast,
                     historical,
                     forecast_time_step=timestep,
@@ -456,5 +475,5 @@ class DWD_Dataset:
 
 
 if __name__ == "__main__":
-    # DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
+    DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
     DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)
