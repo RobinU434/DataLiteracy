@@ -278,6 +278,8 @@ class DWD_Dataset:
         # if feature == Feature.TEMPERATURE or feature == Feature.ALL:
         forecast[forecast_column_name] = forecast[forecast_column_name] / 10
 
+        # set to GMT + 1
+        forecast["time"] = forecast["time"] + pd.Timedelta(hours=1)
 
         return forecast
 
