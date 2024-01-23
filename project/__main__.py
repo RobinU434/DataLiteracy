@@ -26,6 +26,7 @@ def execute(args: dict) -> bool:
                 save_path=args["save_path"],
                 features=args["features"],
                 unpack=args["unpack"],
+                force=args["force"],
             )
 
         case "convert-to-csv":

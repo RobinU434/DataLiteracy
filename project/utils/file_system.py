@@ -1,5 +1,7 @@
 import json
-from typing import Any, Dict
+import os
+import shutil
+from typing import Any, Dict, Iterable
 import yaml
 
 from project.utils.decorator import create_path
@@ -24,3 +26,12 @@ def load_json(path) -> Dict[str, Any]:
         content = json.load(file)
 
     return content
+
+
+def remove(paths: Iterable[str]):
+    for path in paths:
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+                continue
+            os.remove(path)
+        

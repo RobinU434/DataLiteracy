@@ -21,7 +21,7 @@ def add_convert_to_csv_args(parser: ArgumentParser) -> ArgumentParser:
         help="force overwrite the existing files. Defaults to False",
         dest="force",
         action="store_true",
-        default=False,
+        default="False",
     )
     return parser
 
@@ -52,7 +52,12 @@ def add_get_recent_args(parser: ArgumentParser) -> ArgumentParser:
         help="features you want to extract from DWD API",
         dest="unpack",
         action="store_true",
-        default="True",
+    )
+    parser.add_argument(
+        "--force",
+        help="force overwrite the existing files. Defaults to False",
+        dest="force",
+        action="store_true",
     )
     return parser
 
@@ -80,7 +85,6 @@ def add_get_args(parser: ArgumentParser) -> ArgumentParser:
         help="if set to true save results. Defaults to True.",
         dest="save",
         action="store_true",
-        default="True",
     )
     return parser
 

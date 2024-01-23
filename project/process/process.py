@@ -2,6 +2,7 @@ import datetime
 import glob
 import os
 from os import makedirs
+import shutil
 from typing import List
 from shutil import rmtree
 
@@ -20,7 +21,7 @@ from project.process.utils.download_dwd_data import (
 )
 from project.process.utils.unpack_zip import unzip
 from project.utils.download import get_zips
-from project.utils.file_system import load_json, load_yaml
+from project.utils.file_system import load_json, load_yaml, remove
 
 
 class DataProcess:
@@ -102,7 +103,8 @@ class DataProcess:
         station_ids: List[int],
         save_path: str,
         features: List[str],
-        unpack: bool = True,
+        unpack: bool = False,
+        force: bool = False,
     ):
         """get recent (precipitation, pressure, air temperature) data from the dwd database
 
@@ -111,8 +113,23 @@ class DataProcess:
             save_path (str): where you want to store the collected information. It will create this directory if it does not exist already.
             unpack (bool): if set to true we will also unpack the downloaded zips
             features (List[str]): features you want to extract from DWD API
+            force (bool): force overwrite the existing files. Defaults to False
         """
+        reference_dirs = glob.glob(save_path + "/*")
+        if len(reference_dirs) > 0 and not force:
+            result = input(
+                f"There is already reference data {save_path}. Would you like to overwrite them? [Y, n]: "
+            )
+            force = result.lower() in ["", "y", "yes"]
 
+        if not force and len(reference_dirs) > 0:
+            print("Do not overwrite files -> Exit.")
+            return
+
+        # remove existing data
+        if force:
+            print("remove existing directories")
+            remove(reference_dirs)
         makedirs(save_path, exist_ok=True)
 
         features = filter_features(features)
@@ -123,13 +140,13 @@ class DataProcess:
         mask = check_station_ids(station_ids)
         success_counter = 0
         file_names = []
-        for station_id, valid in tqdm(zip(station_ids, mask)):
+        for station_id, valid in tqdm(list(zip(station_ids, mask)), desc="Download files: "):
             if not valid:
                 continue
             file_name = ""
             for feature in features:
                 url = build_recent_url(feature, station_id)
-                file_name = get_zips(url, save_path)
+                file_name = get_zips(url, save_path, verbose=False)
                 if len(file_name) > 0:
                     file_names.append(file_name)
 
@@ -163,7 +180,7 @@ class DataProcess:
             result = input(
                 f"There are already multiple csv files in {output_dir}. Would you like to overwrite them? [Y, n]: "
             )
-            force = result.lower() in ["","y", "yes"]
+            force = result.lower() in ["", "y", "yes"]
 
         csv_folder = glob.glob(output_dir + "*")
         csv_folder_time_stamps = list(map(lambda x: int(x.split("/")[-1]), csv_folder))
@@ -207,9 +224,8 @@ class DataProcess:
                 if file_exists and not force:
                     stats["skip"] += 1
                     continue
-                
+
                 stats["new"] += 1
                 df.to_csv(path)
 
         print("stats: ", stats)
-                
