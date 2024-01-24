@@ -2,18 +2,16 @@ import datetime
 # from datetime import datetime
 
 import matplotlib.pyplot as plt
-import numpy as np
-from enum import Enum
-
-# TODO: get a plot of accuracy or similar thats accumulated over 12h each
 
 from studies.utils.dwd_data import DWD_Dataset, Feature, accumulate_timeseries
 
 import polars as pl
-import pandas as pd
 
-from sklearn import metrics
 from studies.utils.setup_pyplot import SIDEEFFECTS_setup_tueplot
+
+import tueplots.constants.color.palettes as tue_palettes
+
+choosen_palette = tue_palettes.tue_plot
 
 # class ForecastClass(Enum):
 #     """
@@ -26,7 +24,10 @@ from studies.utils.setup_pyplot import SIDEEFFECTS_setup_tueplot
 
 FIG_SAVE_BASE_PATH = "./docs/report/fig/"
 
-def plot_whatever(model_1: DWD_Dataset, model_2: DWD_Dataset):
+def plot_accuracy_masked(
+    model_1: DWD_Dataset,
+    model_2: DWD_Dataset,
+):
     join_cols = ["station_id", "time"]
 
     historical = pl.from_pandas(model_1.get_historical()).sort(join_cols)
@@ -96,8 +97,6 @@ def plot_whatever(model_1: DWD_Dataset, model_2: DWD_Dataset):
 
     stacked = forecast_1_with_hist.vstack(forecast_2_with_hist).select(["station_id", "forecast_time_delta_hours", "time", "prec_over_zero_forecast_correct", "precipitation_real", "precipitation_forecast"]).sort(["station_id", "forecast_time_delta_hours", "time"])
 
-    print(stacked)
-
     test_col = pl.col("prec_over_zero_forecast_correct")
 
     correct_pred = (
@@ -109,8 +108,6 @@ def plot_whatever(model_1: DWD_Dataset, model_2: DWD_Dataset):
             ).alias("forecast_correct_classified"))
             .sort("forecast_time_delta_hours")
     )
-
-    print(correct_pred)
 
     SIDEEFFECTS_setup_tueplot(relative_path_to_root=".")
 
@@ -124,4 +121,4 @@ if __name__ == "__main__":
     model_1 = DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=1)
     model_2 = DWD_Dataset(source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2)
 
-    plot_whatever(model_1, model_2)
+    plot_accuracy_masked(model_1, model_2)
