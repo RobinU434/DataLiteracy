@@ -293,10 +293,7 @@ class DWD_Dataset:
             kennung_id_dict.__getitem__
         )
 
-        # if temperature do rescale
-        # if feature == Feature.TEMPERATURE or feature == Feature.ALL:
         forecast[forecast_column_name] = forecast[forecast_column_name] / 10
-
         # set to GMT + 1
         forecast["time"] = forecast["time"] + pd.Timedelta(hours=1)
 
