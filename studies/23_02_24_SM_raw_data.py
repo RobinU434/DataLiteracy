@@ -98,7 +98,8 @@ def plot_raw_data(
     # ax.set_yscale('log')
 
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=90)
-    ax.set_ylabel("[l/m²]", rotation = 90)
+    ax.set_ylabel("per hour [l/m²h]", rotation = 90)
+    ax.set_xlabel("time [day of month]")
 
     fig.legend()
     fig.suptitle("Precipitation in December")
