@@ -36,7 +36,7 @@ def plot_accuracy_masked(
     forecast_2 = pl.from_pandas(model_2.get_forecast()).sort(join_cols)
 
     historical_accu = accumulate_timeseries(
-        historical, 
+        historical,
         accumulate_time_step=datetime.timedelta(hours=12),
         actual_time_step=datetime.timedelta(hours=1),
         col_to_aggregate=pl.col("precipitation_real"),
@@ -45,7 +45,7 @@ def plot_accuracy_masked(
     )
 
     forecast_1_accu = accumulate_timeseries(
-        forecast_1, 
+        forecast_1,
         accumulate_time_step=datetime.timedelta(hours=12),
         actual_time_step=datetime.timedelta(hours=1),
         col_to_aggregate=pl.col("precipitation_forecast"),
@@ -62,58 +62,72 @@ def plot_accuracy_masked(
         grouped_by=[pl.col("station_id"), pl.col("call_time")],
     )
 
-    historical_accu = historical_accu.with_columns(
-        pl.col("precipitation_real").alias("prec_over_zero_real") > 0.0
-    )
+    forecast_accu = forecast_1_accu.vstack(forecast_2_accu)
+
+    joined = forecast_accu.join(historical_accu, on = join_cols, how = "left")
 
     # forecast_time_delta_expr = (pl.col("time") - pl.col("call_time")).dt.round(every = datetime.timedelta(hours=1)).alias("forecast_time_delta")
     forecast_time_delta_expr = (((pl.col("time") - pl.col("call_time")) / datetime.timedelta(hours=1)).round()).cast(pl.datatypes.Int32).alias("forecast_time_delta_hours")
 
-    forecast_1_accu = forecast_1_accu.with_columns(
+    joined = joined.with_columns(
         forecast_time_delta_expr
     )
 
-    forecast_2_accu = forecast_2_accu.with_columns(
-        forecast_time_delta_expr
-    )
+    # TODO: perhaps try it with logscale for different values
 
-    mask_val = 0.0
+    mask_vals = [0.0, 1.0, 2.0, 5.0]
 
-    test_expr = ((pl.col("precipitation_forecast") > mask_val) == (pl.col("precipitation_real") > mask_val)).alias("prec_over_zero_forecast_correct")
+    joined = joined.select(["station_id", "forecast_time_delta_hours", "time", "call_time", "precipitation_real", "precipitation_forecast"]).sort(["station_id", "forecast_time_delta_hours", "time"])
 
-    # print(forecast_1_accu.sort("forecast_time_delta", descending=True))
-    # print(forecast_2_accu.sort("forecast_time_delta"))
+    # print(joined.filter(pl.col("forecast_time_delta_hours") == 60))
 
-    # exit(0)
+    time_delt = pl.col("forecast_time_delta_hours")
+    # (pl.col("station_id") == 5688) & 
+    print(joined.filter((61 <= time_delt) & (time_delt <= 71)))
 
-    # print(historical_accu, forecast_1_accu, forecast_2_accu)
+    exit(0)
 
-    forecast_1_with_hist = forecast_1_accu.join(historical_accu, on = join_cols, how = "left")
-    forecast_2_with_hist = forecast_2_accu.join(historical_accu, on = join_cols, how = "left")
+    # we have no prediction for hour 71.
+    # this is at the border.
+    # TODO: validate that this is expected
+    # joined = joined.filter(pl.col("forecast_time_delta_hours") != 71)
 
-    forecast_1_with_hist = forecast_1_with_hist.with_columns(test_expr)
+    print(joined)
 
-    forecast_2_with_hist = forecast_2_with_hist.with_columns(test_expr)
+    for mask_val in mask_vals:
+        # we always mask actual rain with 0.0!
+        # otherwise the predictions improve, easy to realize with the  limit case of infinity:
+        # since we never predict infinitely much rain our prediction is always correct.
+        test_expr = ((pl.col("precipitation_forecast") > mask_val) == (pl.col("precipitation_real") > 0.0)).alias(f"over_{mask_val}_masked_forecast_correct")
 
-    stacked = forecast_1_with_hist.vstack(forecast_2_with_hist).select(["station_id", "forecast_time_delta_hours", "time", "prec_over_zero_forecast_correct", "precipitation_real", "precipitation_forecast"]).sort(["station_id", "forecast_time_delta_hours", "time"])
+        joined = joined.with_columns(
+            test_expr,
+        )
 
-    test_col = pl.col("prec_over_zero_forecast_correct")
+    test_cols = pl.col("^over_.*_masked_forecast_correct$")
 
     correct_pred = (
-        stacked
+        joined
             .group_by(["forecast_time_delta_hours"])
-            .agg((
-                test_col.filter(test_col).count().cast(pl.datatypes.Float64) 
-                / test_col.count()
-            ).alias("forecast_correct_classified"))
+            .agg((test_cols.filter(test_cols).count().cast(pl.datatypes.Float64) 
+                / test_cols.count()).name.prefix("part_"))
             .sort("forecast_time_delta_hours")
     )
+
+    print(correct_pred)
 
     SIDEEFFECTS_setup_tueplot(relative_path_to_root=".")
 
     fig, ax = plt.subplots()
+    ax: plt.Axes
 
-    ax.plot(correct_pred["forecast_time_delta_hours"].to_numpy(), correct_pred["forecast_correct_classified"].to_numpy())
+    for mask_val in mask_vals:
+        ax.plot(correct_pred["forecast_time_delta_hours"].to_numpy(), correct_pred[f"part_over_{mask_val}_masked_forecast_correct"].to_numpy(), label=f"considering under {mask_val} as no rain")
+
+    ax.set_xlabel("hours into the future")
+    ax.set_ylabel("accuracy over all stations and call times")
+
+    fig.legend()
 
     fig.savefig(f"{FIG_SAVE_BASE_PATH}/error.pdf")
 
