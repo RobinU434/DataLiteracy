@@ -3,15 +3,15 @@ import datetime
 
 import matplotlib.pyplot as plt
 
-from studies.utils.dwd_data import DWD_Dataset, Feature, accumulate_timeseries
+from studies.utils.dwd_data import DWD_Dataset, Feature
 
 import polars as pl
 
-from studies.utils.setup_pyplot import SIDEEFFECTS_setup_tueplot
-
-import tueplots.constants.color.palettes as tue_palettes
-
-choosen_palette = tue_palettes.tue_plot
+from studies.utils.setup_pyplot import (
+    SIDEEFFECTS_setup_tueplot,
+    SIDEEFFECTS_choose_color_palette,
+    FIG_SAVE_BASE_PATH,
+)
 
 # class ForecastClass(Enum):
 #     """
@@ -21,8 +21,6 @@ choosen_palette = tue_palettes.tue_plot
 #     """
 #     Forecast1H = 1,
 #     Forecast3H = 2,
-
-FIG_SAVE_BASE_PATH = "./docs/report/fig/"
 
 
 def plot_accuracy_masked(
@@ -41,15 +39,22 @@ def plot_accuracy_masked(
     #     aggregation_op=pl.col("precipitation_real").sum(),
     #     grouped_by=[pl.col("station_id")],
     # )
+    time_col = pl.col("time")
 
-    forecast_1 = pl.from_pandas(model_1.get_forecast()).sort(join_cols)
-    forecast_2 = pl.from_pandas(model_2.get_forecast()).sort(join_cols)
+    forecast_1 = (
+        pl.from_pandas(model_1.get_forecast())
+        .sort(join_cols)
+        .with_columns((time_col + datetime.timedelta(hours=1)).alias("time_end"))
+    )
+    forecast_2 = (
+        pl.from_pandas(model_2.get_forecast())
+        .sort(join_cols)
+        .with_columns((time_col + datetime.timedelta(hours=3)).alias("time_end"))
+    )
 
     # print(historical.sort(join_cols).write_csv("whatever_or.csv"))
 
     forecast = forecast_1.vstack(forecast_2)
-
-    time_col = pl.col("time")
 
     forecast_time_delta_expr = (
         (((pl.col("time") - pl.col("call_time")) / datetime.timedelta(hours=1)).round())
@@ -62,8 +67,12 @@ def plot_accuracy_masked(
     # for some reason floating point accuracy messed up our 0.0 for some accumulations.
     # so we remove that issue. Originally both forecast and historical data were given as integer as original value times 10.
     # we go there for accumulation, and then back again
-    integerify_precipitation = (pl.col("^precipitation_.*$") * 10).cast(pl.datatypes.Int32)
-    floatify_precipitation = (pl.col("^precipitation_.*$").cast(pl.datatypes.Float64) / 10)
+    integerify_precipitation = (pl.col("^precipitation_.*$") * 10).cast(
+        pl.datatypes.Int32
+    )
+    floatify_precipitation = (
+        pl.col("^precipitation_.*$").cast(pl.datatypes.Float64) / 10
+    )
     forecast = forecast.with_columns(integerify_precipitation)
 
     forecast = (
@@ -75,7 +84,7 @@ def plot_accuracy_masked(
             offset=datetime.timedelta(),
         )
         .agg(pl.col("precipitation_forecast").sum())
-        # we drop the last datapoints, where the accumulation goes over 
+        # we drop the last datapoints, where the accumulation goes over
         # the actually measured time window and assumes 0 for all values in there
         .with_columns(forecast_time_delta_expr)
         # .sort("forecast_time_delta_hours")
@@ -93,21 +102,26 @@ def plot_accuracy_masked(
             by=["station_id"],
             closed="left",
             offset=datetime.timedelta(),
-        )
-        .agg(pl.col("precipitation_real").sum())
+        ).agg(pl.col("precipitation_real").sum())
         # .slice(offset=0, length=-int(12 / 1))
     )
 
     historical = historical.with_columns(floatify_precipitation)
 
     # print(
-    # historical.sort(join_cols).write_csv("whatever.csv"),#[13:], 
+    # historical.sort(join_cols).write_csv("whatever.csv"),#[13:],
     # historical_accu.sort(join_cols).write_csv("whatever2.csv"),
     # )
 
     joined = forecast.join(historical, on=join_cols, how="left")
 
-    mask_vals = [0.0, 0.1, 0.2, 0.5, 2.0]
+    mask_vals = [
+        0.0,
+        # 0.1,
+        # 0.2,
+        0.5,
+        2.0,
+    ]
 
     joined = joined.select(
         [
@@ -167,6 +181,8 @@ def plot_accuracy_masked(
 
     SIDEEFFECTS_setup_tueplot(relative_path_to_root=".")
 
+    SIDEEFFECTS_choose_color_palette()
+
     fig, ax = plt.subplots()
     ax: plt.Axes
 
@@ -175,14 +191,17 @@ def plot_accuracy_masked(
             correct_pred["forecast_time_delta_hours"].to_numpy(),
             correct_pred[f"part_over_{mask_val}_masked_forecast_correct"].to_numpy(),
             label=f"T = {mask_val}",
+            zorder=1 if mask_val == 0.0 else -1,
+            # c = choosen_palette[idx],
         )
 
-    ax.set_xlabel("hours into the future")
-    ax.set_ylabel("accuracy over all stations and call times")
+    ax.set_xlabel("hours ahead")
+    ax.set_ylabel("Accuracy")  # over all stations and call times
 
     fig.legend()
 
-    fig.savefig(f"{FIG_SAVE_BASE_PATH}/error.pdf")
+    fig.savefig(f"{FIG_SAVE_BASE_PATH}/fig_accuracy_thresholds.pdf")
+
 
 if __name__ == "__main__":
     model_1 = DWD_Dataset(
