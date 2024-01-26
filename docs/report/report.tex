@@ -1,0 +1,408 @@
+%%%%%%%% ICML 2023 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+
+\usepackage{tikz}
+% Corporate Design of the University of Tübingen
+% Primary Colors
+\definecolor{TUred}{RGB}{165,30,55}
+\definecolor{TUgold}{RGB}{180,160,105}
+\definecolor{TUdark}{RGB}{50,65,75}
+\definecolor{TUgray}{RGB}{175,179,183}
+
+% Secondary Colors
+\definecolor{TUdarkblue}{RGB}{65,90,140}
+\definecolor{TUblue}{RGB}{0,105,170}
+\definecolor{TUlightblue}{RGB}{80,170,200}
+\definecolor{TUlightgreen}{RGB}{130,185,160}
+\definecolor{TUgreen}{RGB}{125,165,75}
+\definecolor{TUdarkgreen}{RGB}{50,110,30}
+\definecolor{TUocre}{RGB}{200,80,60}
+\definecolor{TUviolet}{RGB}{175,110,150}
+\definecolor{TUmauve}{RGB}{180,160,150}
+\definecolor{TUbeige}{RGB}{215,180,105}
+\definecolor{TUorange}{RGB}{210,150,0}
+\definecolor{TUbrown}{RGB}{145,105,70}
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2023} with \usepackage[nohyperref]{icml2023} above.
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\usepackage[accepted]{icml2023}
+
+% For theorems and such
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+
+\DeclareMathAlphabet\mathbfcal{OMS}{cmsy}{b}{n}
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Project Report Template for Data Literacy 2023/24}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Accuracy in Short-Term Precipitation Prediction}
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2023
+% package.
+
+% List of affiliations: The first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% You can specify symbols, otherwise they are numbered in order.
+% Ideally, you should not use this facility. Affiliations will be numbered
+% in order of appearance and this is the preferred way.
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Robin Uhrich}{equal,first}
+\icmlauthor{Leonor Diederichs}{equal,second}
+\icmlauthor{Mathias Neitzel}{equal,third}
+\icmlauthor{Samuel Maier}{equal,fourth}
+\end{icmlauthorlist}
+
+% fill in your matrikelnummer, email address, degree, for each group member
+\icmlaffiliation{first}{matriculation number 6651884, robin.uhrich@student.uni-tuebingen.de, MSc Machine Learning}
+\icmlaffiliation{second}{matriculation number 6638382, lilli.diederichs@gmail.com, MSc Machine Learning}
+\icmlaffiliation{third}{matriculation number 4243096, mathias-neitzel@student.uni-tuebingen.de, MSc Machine Learning}
+\icmlaffiliation{fourth}{matriculation number    4243096, sam.maier@student.uni-tuebingen.de, MSc Machine Learning}
+
+% Yo may provide any keywords that you
+% find helpful for describing your paper; these are used to populate
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{Machine Learning, ICML}
+
+\vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column
+% listing the affiliations and the copyright notice.
+% The command takes one argument, which is text to display at the start of the footnote.
+% The \icmlEqualContribution command is standard text for equal contribution.
+% Remove it (just {}) if you do not need this facility.
+
+%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\begin{abstract}
+In this report we discuss the forecast performance, provided by the Deutscher Wetter Dienst (DWD)
+%In this paper we wan
+%Weather predictions have to be precise to allow for accurate planning in diverse situations, the main idea behind this work is %to check how accurate the precipitation predictions actually are.\\
+%We achieve this by conducting a comparative analysis of forecasted and observed precipitation data obtained from a designated %set of weather stations provided by the Deutschen Wetter Dienst (DWD).
+
+% diverse situations: aggriculture, renewable energy planning, or even personal hiking tours.
+% use other word than "check" 
+% We are doing our comparative analysis on the basis collected forecast and observed precipitation data obtained on a designated set of weather stations provided by the Deutschen Wetter Dienst (DWD).
+
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+When we look at the weather forecast, we often question its reliability. The quality of a forecast is relevant in personal life, in agriculture planning and even vital in measuring the risk of floods. Which become according to \cite{FloodTrends} more and more prominent as we know for example from the Ahrtal valley in 2021 \cite{pink} or most recent flooding event in Germany at around Christmas 2023 \cite{flooding_christmas}. \\
+
+In this report we discuss the quality of precipitation forecasting in Baden-Württemberg using the German Weather Service (DWD). 
+We look at the quality of the 3-day and 10-day forecasts from 36 stations to check for over- and under-prediction of precipitation and calculate the accuracy of the forecasts. 
+To further understand the predictions and the limitations of our data, we look at the correlation of our input features and evaluate the dependence of a station's location on its forecast. 
+A very local weather phenomenon combined with a local lack of drainage can lead to flooding. The short term cumulative rainfall can indicate such risks, which we look at last \cite{pink}. % Not again, there is too much flodding throughout the text. 
+
+% Throughout the report we will to answer following questions. % do we really answer it???
+% First we would like to know how accurate a given forecast over the measured timeframe actually is. Further we would like to how far off the forecasts are compared to the measured reference data. Finally we will investigate if the location in a compared small area does influence the quality of weather forecasting.   
+
+
+\\
+
+\begin{figure}[h]
+    \centering
+    \label{fig:bw-stations}
+    \includegraphics{figures/fig_bawu_map_stations.pdf}
+    \caption{Each selected station is one dot on the map. The blue dot is Tübingen (which has no data), the red dot is Dachsberg-Wolpadingen}
+\end{figure}
+
+
+\section{Data}\label{sec:Data}
+% TODO: reference to release !!!!
+Our analysis is based on data provided by the DWD. We collected forecasts on a daily basis for every weather station marked in \textit{Figure \ref{fig:bw-stations}} from the \href{https://opendata.dwd.de/climate_environment/CDC/}{Open-Data dataset}. The dataset is divided in two categories:
+\begin{itemize}
+    \item \textbf{Reference Precipitation}:\\
+    Selected DWD weather stations measure precipitation with a rain gauge called rain[e]H3 \cite{rain-e}. The DWD provides the recent and historical measurement of precipitation with free access in the \href{https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/}{CDC dataset}. We use these measurements as a reference to the forecast of each station. 
+
+    \item \textbf{Predictions}:\\
+    The weather forecasts of all stations marked in \textit{Figure \ref{fig:bw-stations}} are collected once a day at 00:10. The total precipitation is forecast every hour for the next 3 days and every three hours for up to ten days.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \label{fig:dec_diff_call_times}
+    % TODO(SAM) : 
+    % 1. label x-axis
+    % 2. only 2 call times
+    % 3. reference in 10days currently desnt seem to start in the beginning. fix that.
+    % 4. in the text or caption, highlight that the 10 days forecasts for each call time start exactly when the 3 day ends.
+    \includegraphics{figures/fig_forecast_dec_diff_call_times.pdf}
+    % \caption{Raw Data for one station (red marked in Figure \ref{fig:bw-stations}, three call times in December}
+    \caption{Raw Data for station in Dachsberg-Wolpadingen (red marked in Figure \ref{fig:bw-stations}. Forecasts from the 2023-12-18 and 2023-12-19 in color. reference data in gray.}
+    
+    % TODO: x axis has 12 h steps. Either mark it as 12h steps or take every second tick
+\end{figure}
+
+We began our collection in 08.12.2023 and ended on 25.1.2024 resulting in 225,792 forecast samples. Because our reference data is limited up to the 25.01.2024 we have in total XXXXX samples. \\    
+% A section of the available data can be seen in Figure \ref{fig:dec_diff_call_times}. There are several forecasts for one point in time since 
+% THAT IS WRONG!!!
+% we have an 3-day and a 10-day report for each call time.
+% correct:
+that time is forecast from multiple call times.
+A section of the available data can be seen in Figure \ref{fig:dec_diff_call_times}. Here we can see the measured precipitation a reference in gray and colored the different call times. The different call times start on their call day and predict for the following 3 days and thereafter 7 days. Therefore we get multiple forecasts for one time. 
+
+\section{Methods}\label{sec:Methods}
+As declared before our data is split into two categories: forecasts $\hat{\textbf{X}}$ and reference data $\textbf{X}$. Where $\hat{\textbf{X}}_{t, s, c, i}$ is the precipitation forecast at station $s$, at time $t$ queried at time $c$, and $i \in \{1, 2\}$ for three day and 10 day forecast. Respectively  $\textbf{X}_{t, s}$ is the reference precipitation data at station $s$ and at time $t$.\\
+An alternative notion for forecast data is: $\hat{\mathbfcal{X}}_{\Delta t, s, c, i}$ where $\Delta t$ is the time delta between the timestamp of the query time and the time the forecast is for.
+
+We denote $N$ as the number of stations, $T$ as the number of all possible timestamps with forecast and reference data, $C$ is the number of queries executed and $Q$ as the number of time steps ahead the forecast model is predicting.   
+
+
+\subsection{Difference Measurement}\label{sec:mean}
+% SAM: I want to significantly overhaul the notation in here. 
+To access insight into the quantity how wrong the forecast actually is we define two difference metrics. The mean error in \textit{Equation \ref{eq:ME}} and mean absolute error \textit{Equation \ref{eq:MAE}}.
+
+\begin{align}
+    ME(\hat{\mathbfcal{X}}, \textbf{X})_{\Delta t, i} &=   \frac{1}{N C} \sum_{s, c} \hat{\mathbfcal{X}}_{\Delta t, s, c, i} - \textbf{X}_{c + \Delta t, s}
+    \label{eq:ME} \\
+    MAE(\hat{\mathbfcal{X}}, \textbf{X})_{\Delta t, i} &=   \frac{1}{N C} \sum_{s, c} |\hat{\mathbfcal{X}}_{\Delta t, s, c, i} - \textbf{X}_{c + \Delta t, s}|
+    \label{eq:MAE}
+\end{align}
+
+% For the mean forecasting error we used the difference between forecast and reference precipitation per station. For each time step ahead $\Delta t_{i}$=(1, 2, 3, .. days).  we have at m call times providing forecast values for n days. To calculate the difference for each $\Delta t$ take call times minus the time it is predicting and group by the $\Delta t$.
+% $$y(\Delta t_i (station) = \frac{1}{m \cdot n} \sum_{i = 1}^{n\cdot m} y_{\Delta t_i (station)}$$
+% with $ \Delta t = t_{call}-t$ and \\ 
+%  y = forecast -precipitation$ 
+
+% Another measurement for the difference of the forecast to the reference is the absolute mean: 
+% SAM: in formulas, stings like station should be wrapped in text. Slanted multisymbol things are functions, values of more than one symbol are upright.
+% thats how it usually is. Dont ask me why.
+% $$y(\Delta _t,station) = \frac{1}{n \cdot m} \sum_{i = 1}^{m \cdot n} |y_{\Delta t_i (station)}|$$
+
+
+
+% why not use align???
+% What are benefits from one metri over the other. 
+
+\subsection{Accuracy}\label{sec:accuracy}
+% In this method we look at the set of all pairs $(x_i,\hat{x}_{i,t})$, $\hat{x}_{i,t}$ the forecast and $x_i$ the reference.\\
+% %TODO: Robin% 
+
+% Like this we get for each threshold an accuracy, the balanced accuracy and F1-score.
+% % Two metrics at maximum% 
+
+% One well established metric to asses the quality of a prediction model is the accuracy .  
+
+\subsection{Accuracy Sam}
+
+In rough approximation of what the DWD is doing to judge the quality of their forecast\footnote{\url{https://www.dwd.de/DE/wetter/schon_gewusst/qualitaetvorhersage/qualitaetvorhersage_node.html\#doc446682bodyText2} Abbildung 2, right} 
+% Do it as a source not a footnote. 
+, we calculate the accuracy of predicting that it rains for different thresholds and different timesteps into the future.
+
+We get the following formula:
+\begin{align}
+    \sum_{s \in \text{Stations},c \in \text{Call Times}}
+    \hat{\textbf{X}}_{\Delta t, s, c}^{\Delta T}
+\end{align}
+
+
+
+%Leave this section out completely
+\subsection{Cumulative Sum of Precipitation}
+% $$ \sum_{i = first day}^{last day} x_{i, station}$$
+% TODO: REFORMULATE!!!!
+%TODO: I am not sure if we meaned over call time? Are we adding up as many forecasts as we have calltimes?
+
+To have a look into the total amount the forecast was of by the end of measurements we define the cumulative precipitation per station in \textit{Equation \ref{eq:reference_cumsum}} and the cumulative mean forecast in \textit{Equation \ref{eq:forecast_cumsum}}. 
+\begin{align}
+    \widehat{CP}(\hat{\textbf{X}})_{s, t, i} &=  \sum_{\overset{\sim}{t} = t_0}^{t} \frac{1}{C_{\overset{\sim}{t}}}\sum_c \textbf{X}_{\overset{\sim}{t}, s, c,  i}
+    \label{eq:forecast_cumsum}\\ 
+    CP(\textbf{X})_{s, t} &= \sum_{\overset{\sim}{t} = t_0}^{t} \textbf{X}_{\overset{\sim}{t}, s}
+    \label{eq:reference_cumsum}
+\end{align}
+
+$t_0$ denotes the begin and $t_{\max}$ the end of measurements. $C_{\overset{\sim}{t}}$ is the number of forecasts available for a specific timestamp.
+
+
+\section{Results}\label{sec:results}
+
+% To check for the quality of the forecast, we evaluate the raw data displayed in Figure \ref{fig:dec_diff_call_times}. Here we can see the measured precipitation a reference in gray and colored the different call times. The different call times start on their call day and predict for the following 3 days and thereafter 7 days.
+% upper paragraph moved to data since this is data structure. 
+
+The 3-day forecast seems to be closer to the reference in time but underestimates the amount of precipitation.
+The 10-day forecast predicts for every third hour, so the forecast naturally predicts less precise the timing.  
+% These are assumptions not facts proofed by the analysis -> delete
+
+So far we looked at one station and two call days, to further handle the data we need break down this tensor of stations, call day, time, and forecast type. Note that a mean over call times inherits an error by the deviation of the forecasts from the different call days. This deviation of the call days forecasting different values for the same day we examine in the Figure \ref{fig:mean_trend}. \\
+% Maybe talk about the higher true pos rate here?
+%  
+
+According to Eq.:\ref{sec:mean} find the evolution of the forecasts for different call times by calculating the mean over time steps into the future $\Delta t$ for all days. We can see on the left plot (Figure:\ref{fig:mean_trend}) the mean deviation over $\Delta t$ ahead for all stations and the trend of the mean of the stations for the 3-Day forecast  (Figure: \ref{fig:mean_trend}). On the right hand side the same metric is plotted for the 10-day forecast. \\
+Remarkably the deviations of the stations are convergent, especially for the 10-day forecast the difference of forecast to precipitation oscillates similarly for most stations. However there is one station Dachsberg-Wolpadingen (marked in red) with amuch higher amplitude. This station lies in the small region of flooded areas, which we can see in the cumulative sum of precipitation later Figure:\ref{fig:cum_sum_heavy_rain}. \\
+
+For the 3-day forecast the trend is positive, hence predicts in sum more than what poured down. The 10-day forecast predict in average less precipitation than occurred the further the time it predicts ahead. But looking at the absolute mean error of 10-day forecast we get a positive trend that is higher than the 3-day forecast trend. So the absolute deviation of the forecast increases the further we predict ahead.\\
+
+\begin{figure}[h]
+\centering
+\label{fig:mean_trend}
+\includegraphics{report/figures/fig_mean_trend.pdf}
+\caption{The difference of forecast precipitation and reference precipitation for time steps ahead for each station (gray), the mean over all stations (blue) and the trend of the mean (orange). }
+\end{figure}
+%xlim for error fig smaller bc distribtion is around [0,1] convergence of metric is misleading-DONE
+  Processing the data according to \ref{sec:accuracy} we can see in Figure: \ref{fig:error} in the background in gray the distribution of the data and in color the metrics for both the 3-day and the  10-day forecast. The convergence of our errors is due to the metric. The higher the threshold we still accept as "no rain" the lower the true positive and false negative rates will be. We can see the distribution of our data is accordingly. For the 3-day forecast the true negative rate saturates faster at a higher level than the 10-day forecast. The false positive rate decreases faster and the false negative declines more rapidly compared to the 10-day forecast.\\ 
+The confusion statistics of metric: \ref{sec:accuracy} are shown in Figure: \ref{fig:treffer} where 
+\begin{figure}[h]
+\centering
+\label{fig:error}
+\includegraphics{report/figures/fig_error.pdf}
+\caption{Error statistics}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\label{fig:accuracy}
+\includegraphics{report/figures/fig_accuracy_thresholds.pdf}
+\caption{TODO SAM}
+\end{figure}
+
+
+By averaging over all forecast that predict $\Delta t$ into the future we assume, that the forecast per day is independently identically distributed. While this seems physically unrealistic, our forecast seems to be IID as we found the day is uncorrelated to the forecast and the difference of the forecast to the reference value. The location does not have an influence on the forecast either. The stations features only correlate with their own: Longitude, Latitude and Altitude. \\
+The forecast seems to be mainly be correlated by the reference precipitation. 
+\begin{figure}[h]
+\centering
+\label{fig:corr_matrix}
+\includegraphics{report/figures/fig_correlation_matrix.pdf}
+\caption{Correlation Matrix of input features}
+\end{figure}
+
+By looking at the time frame the floods occurred in south Germany and calculating the accumulated sum, we estimate how much water came down in this time frame and how much was expected by the 3-Day forecast. In this plot we can see, for one station the amount of water surpassed $700 [l/m^2]$ by the end of December when the forecast predicted around than $400 [l/m^2]$. The mean precipitation for December in Baden-Württemberg is 114 [l/m²] \ref{} which was exceeded in only 3 days.
+
+\begin{figure}[h]
+\centering
+\label{fig:cum_sum_heavy_rain}
+\includegraphics{report/figures/fig_heavy_rain_dec.pdf}
+\caption{Unforcasted extreme precipitation in Dachsberg-Wolpadingen, marked red in figure \ref{fig:bw-stations}. Cumulative Sum for the sanity check. }
+\end{figure}
+
+
+\section{Discussion \& Conclusion}\label{sec:conclusion}
+Forecast predictions depend on many factors. With our data we could get an idea of the forecast of the DWD, which contributes to most forecasts in Germany. % We cann't say that without source or results 
+The data was collected in a rainy season and only for a Baden-Württemberg. % rainy compared to what? to other years, to other seasons? Weird sentence.  
+Our results indicate only tendencies for 3-day and 10-day forecasts. For a thorough analysis we would have needed to record for at least a whole year and larger regions. Meteorological effects, large weather phenomenon or global warming, couldn't be derived from 49 days of forecast recording. % Why... do we have any proofs or any circumstatial evidence?
+Nonetheless we find our results could, still help you to read the forecast more carefully.\\ % The controversial stuff  why our analysis is to read with care at the end of this section 
+Our results indicate that the 3-day forecast is more accurate in terms of timing and amount of precipitation.  % By how much? with wich std? 
+Looking at the difference between forecast and reference precipitation plotted in \textit{Figure:\ref{fig_mean_trend}}, the mean trend does increase for hours ahead but is very low.  % numbers, weird sentence 
+% include  effects like propagation of errors into the discussion. 
+Therefore in mean the amount of precipitation is slightly lower than was predicted. The trend for the absolute difference \ref{sec:mean} is higher, but still rather close to zero. %siginificance test? dont get it as an "expert"
+So in mean the amount of rain predicted, was %(not significantly) 
+similar to the reference precipitation. The 10-day forecast has a steeper mean trend in the difference of precipitation, with a negative trend indicating that the amount of rain was underestimated. The trend of the absolute difference is steeper compared to the absolute trend of the 3-day forecast, indicating that the 10-day forecast predicts less accurate in amount and timing. \\  % Does not answer the research question. 
+% What is the benefit of this information. Isn't this part of the results (interpretation / discussion) is missing?
+The accuracy underlines this relation.
+The hourly accuracy reached reliable values of $>80\%$ for the one hour ahead which is in the well aligned with the 12h-accuracy of the DWD \ref{}. However the forecast's accuracy does not reflect the extent of deviation in the event of rainfall. The accuracy of the forecast is potentially misleading as it does not consider the amount of rainfall. \\
+For example the extreme rainfall in Dachsberg-Wolpadingen was not expected. Looking at the Figure \ref{fig_cum_sum} we can see the accumulated amount of rain was especially high for Dachsberg-Wolpadingen. The average rainfall in December 2023 in Baden-Württemberg was 114 $[l/m²]$ which Dachsberg-Wolpadingen surpassed in only 4 days.\ref{https://www.dwd.de/EN/press/press_release/EN/2023/20231229_the_weather_in_germany_in_december_2023.pdf?__blob=publicationFile&v=3}  % To early. Just state we get different amounts of precipitation and why the accuracy trend is decresing, and why the different threshold curves look / are in relation as they do.  
+%p.1 caption:Extremely wet with record amounts in northern central Germany and high water at Christmas
+The high precipitation together with the lack of drain and dry surfaces caused a flood in the region of Dachsberg-Wolpadingen..\ref{$https://de.wikipedia.org/wiki/Weihnachtshochwasser_2023$.}  % Whats the benefit of this? We do not explain floods. 
+This high precipitation could be due to very local meterological effect. In that case the location of the station would give an insight to the deviation of the forecast.\\  
+% Again, relation the research question. Why do we discuss this?
+
+But looking at the correlation matrix \ref{fig:corr_matrix} the locations of the stations in Baden-Württemberg showed almost no correlation to the forecast or its difference to the reference data. 
+In the Figure \ref{fig:mean_trend} we see that there are deviations in the difference of the forecast to the reference precipitation, however the behavior of the stations were similar. 
+% The observation of small correlation between location and forecast metric is supported by Figure \ref{fig:mean_trend} where all grey curves look similar. 
+Even for Dachsberg-Wolpadingen the oscillations had been around the same mean trend.  % Wrong !!!.  Dachsberg is für model 1 and 2 the lowest grey curve which is clearly  all the time below 0 and strongly differentiable!!!!.  
+We can see that the deviations were especially big for Dachsberg-Wolpadingen but as the correlation matrix indicates no correlation of the location and it's error, we suspect that the high oscillation are due to the heavy precipitation events and not generally higher for Dachsberg-Wolpadingen. For definite result we would need a collection time that is not dominated by extreme precipiatation events.\\  % Nice approach but not well formulated sentence at the end. 
+
+
+%We could also see that the forecast is independent of the day, which confirms our assumption to treat the daily forecasts as independent identically distributed, which was necessary for or analysis.\\
+To sum up our analysis we came to the conclusion that weather is a highly complex topic and quantifying the performance of a forecast is similar difficult with many more aspects and features we haven't even done the analysis for yet. Therefore we cannot make definite claims with the amount of data we gathered until now, but we were able to show that our analysis does relate to the previous analysis published by the DWD. % source 
+With the sanity check of extreme precipitation in Dachsberg-Wolpadingen \ref{}  we have another indicator that our analysis is reliable.  % sanity check IF included in the report not in the end
+% Overall forecasting is a complicated matter, with varying feature for the predictions. 
+We found that the forecast does worsen the further it predicts into the future. Looking 3 days ahead the forecast tends to predict a little more rain and with the highest accuracy. The 10-day forecast does underestimate the amount of rain and worsens in accuracy dropping from 80 \% for 4 days ahead down to 55\% for 10 days ahead. Additionally it does happen that a forecast underestimates the amount of rainfall drastically but this is usually due to additional circumstances. There is no general area in Baden-Württemberg that correlates with it's precipitation or forecasting error.
+%We encourage you to keep talking about the weather as if it was interesting. Not that is is almost as dramatic as in Ahrtal but now you can add at least something of scientific quality to your small talk :)
+
+
+\section*{Acknowledgements}
+
+We would like to thank the DWD to provide public access to forecast and reference data. Especially we would like to thank Axel Kuschnerow for given support. Also we thank our Tutor, Emilia Magnani for help and advice at any time.
+
+
+\section*{Contribution Statement}
+
+Samuel Maier and Robin Uhrich wrote the Python code base to collect and prepared the data. Together with Leonor Diederichs they performed the data analysis. In parallel Mathias Neitzel assisted by formulating the analysis into formal statements. Leonor Diederichs was responsible for the visualizations. All authors jointly wrote the text of the report. \\    
+% \section*{Notes} 
+%TO Do (LILLI): Results for Confusion Statistics and correlatio matrix.
+%citations for extreme weather amunt and avg amount in dec
+%Check the captions, they all look weird. Sometime I explain in results what the plots mean maybe transfer those describtion into the caption
+%Results: IID assumtion with corr matrix justified
+
+% Your entire report has a \textbf{hard page limit of 4 pages} excluding references. (I.e. any pages beyond page 4 must only contain references). Appendices are \emph{not} possible. But you can put additional material, like interactive visualizations or videos, on a githunb repo (use \href{https://github.com/pnkraemer/tueplots}{links} in your pdf to refer to them). Each report has to contain \textbf{at least three plots or visualizations}, and \textbf{cite at least two references}. More details about how to prepare the report, inclucing how to produce plots, cite correctly, and how to ideally structure your \href{https://github.com/RobinU434/DataLiteracy}{GitHub repository}, will be discussed in the lecture, where a rubric for the evaluation will also be provided.  
+
+% TODO: (SAM)
+% it may be worth it to move some things from references into footnotes, as footnotes take up less space.
+% concretely and at this point in time, the 'reference' to the lambrecht website. Which isnt really an academic work, but a datasheet, which is important, but not what is usually referenced in bibliographic style.
+
+\bibliography{bibliography}
+\bibliographystyle{icml2023}
+
+\end{document}
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was created
+% by Iain Murray in 2018, and modified by Alexandre Bouchard in
+% 2019 and 2021 and by Csaba Szepesvari, Gang Niu and Sivan Sabato in 2022.
+% Modified again in 2023 by Sivan Sabato and Jonathan Scarlett.
+% Previous contributors include Dan Roy, Lise Getoor and Tobias
+% Scheffer, which was slightly modified from the 2010 version by
+% Thorsten Joachims & Johannes Fuernkranz, slightly modified from the
+% 2009 version by Kiri Wagstaff and Sam Roweis's 2008 version, which is
+% slightly modified from Prasad Tadepalli's 2007 version which is a
+% lightly changed version of the previous year's version by Andrew
+% Moore, which was in turn edited from those of Kristian Kersting and
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.
+u
