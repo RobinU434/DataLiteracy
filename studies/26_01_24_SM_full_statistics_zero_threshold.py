@@ -23,7 +23,7 @@ from studies.utils.setup_pyplot import (
 #     Forecast3H = 2,
 
 
-def plot_accuracy_masked(
+def plot_full_statistics(
     model_1: DWD_Dataset,
     model_2: DWD_Dataset,
 ):
@@ -115,15 +115,6 @@ def plot_accuracy_masked(
 
     joined = forecast.join(historical, on=join_cols, how="left")
 
-    mask_vals = [
-        0.0,
-        # 0.1,
-        # 0.2,
-        0.5,
-        2.0,
-        # 5.0,
-    ]
-
     joined = joined.select(
         [
             "station_id",
@@ -135,50 +126,42 @@ def plot_accuracy_masked(
         ]
     ).sort(["station_id", "forecast_time_delta_hours", "time"])
 
-    # print(joined.filter(pl.col("forecast_time_delta_hours") == 60))
+    forecast_rain: pl.Expr = (pl.col("precipitation_forecast") > 0.0)
+    # we always mask actual rain with 0.0!        
+    actual_rain: pl.Expr = (pl.col("precipitation_real") > 0.0)
 
-    # time_delt = pl.col("forecast_time_delta_hours")
-    # # (pl.col("station_id") == 5688) &
-    # print(joined.filter((61 <= time_delt) & (time_delt <= 71)))
+    test_exprs_1 = {
+        "true positive": (forecast_rain & actual_rain).sum() / actual_rain.count(),
+        "false positive": (forecast_rain & actual_rain.not_()).sum() / actual_rain.count(),
+        "false negative": (forecast_rain.not_() & actual_rain).sum() / actual_rain.count(),
+        "true negative": (forecast_rain.not_() & actual_rain.not_()).sum() / actual_rain.count(),
+        "accuracy": ((forecast_rain == actual_rain).sum() / forecast_rain.count()),
+        "precision": ((forecast_rain & actual_rain).sum() / forecast_rain.sum()),
+        "recall": ((forecast_rain & actual_rain).sum() / actual_rain.sum()),
+    }
 
-    # exit(0)
+    test_exprs_2 = {
+        "F-score": 2 / (1/pl.col("accuracy") + 1/pl.col("recall")),
+    }
 
-    # we have no prediction for hour 71.
-    # this is at the border.
-    # TODO: validate that this is expected
-    # joined = joined.filter(pl.col("forecast_time_delta_hours") != 71)
-
-    # print(
-    # joined.write_csv("all_data.csv")
-    # )
-
-    for mask_val in mask_vals:
-        # we always mask actual rain with 0.0!
-        # otherwise the predictions improve, easy to realize with the  limit case of infinity:
-        # since we never predict infinitely much rain our prediction is always correct.
-        test_expr = (
-            (pl.col("precipitation_forecast") > mask_val)
-            == (pl.col("precipitation_real") > 0.0)
-        ).alias(f"over_{mask_val}_masked_forecast_correct")
-
-        joined = joined.with_columns(
-            test_expr,
-        )
-
-    test_cols = pl.col("^over_.*_masked_forecast_correct$")
-
-    correct_pred = (
-        joined.group_by(["forecast_time_delta_hours"])
-        .agg(
-            (
-                test_cols.filter(test_cols).count().cast(pl.datatypes.Float64)
-                / test_cols.count()
-            ).name.prefix("part_")
-        )
-        .sort("forecast_time_delta_hours")
+    joined = joined.group_by(["station_id", "forecast_time_delta_hours"]).agg(
+        [*[expr.alias(label) for (label, expr) in test_exprs_1.items()]]
     )
 
-    print(correct_pred)
+    joined = joined.sort("forecast_time_delta_hours")
+
+    joined = joined.with_columns([expr.alias(label) for (label, expr) in test_exprs_2.items()])
+
+    all_test_exprs = [
+        *test_exprs_1.keys(),
+        *test_exprs_2.keys(),
+    ]
+
+    joined_agg = joined.group_by("forecast_time_delta_hours").agg(
+        pl.col(all_test_exprs).mean(),
+    )
+
+    print(joined_agg)
 
     SIDEEFFECTS_setup_tueplot(relative_path_to_root=".")
 
@@ -187,21 +170,21 @@ def plot_accuracy_masked(
     fig, ax = plt.subplots()
     ax: plt.Axes
 
-    for mask_val in mask_vals:
+    for label in all_test_exprs:
         ax.plot(
-            correct_pred["forecast_time_delta_hours"].to_numpy(),
-            correct_pred[f"part_over_{mask_val}_masked_forecast_correct"].to_numpy(),
-            label=f"T = {mask_val}",
-            zorder=1 if mask_val == 0.0 else -1,
+            joined_agg["forecast_time_delta_hours"].to_numpy(),
+            joined_agg.select(label).to_numpy(),
+            label=label,
+            # zorder=1 if mask_val == 0.0 else -1,
             # c = choosen_palette[idx],
         )
 
-    ax.set_xlabel("$\Delta t$ [hours]")
-    ax.set_ylabel("Accuracy")  # over all stations and call times
+    ax.set_xlabel("$\Delta t$ [h]")
+    ax.set_ylabel("value [1]")  # over all stations and call times
 
     fig.legend()
 
-    fig.savefig(f"{FIG_SAVE_BASE_PATH}/fig_accuracy_thresholds.pdf")
+    fig.savefig(f"{FIG_SAVE_BASE_PATH}/fig_full_statistics.pdf")
 
 
 if __name__ == "__main__":
@@ -212,4 +195,4 @@ if __name__ == "__main__":
         source_path="./data/dwd", feature=Feature.PRECIPITATION, model=2
     )
 
-    plot_accuracy_masked(model_1, model_2)
+    plot_full_statistics(model_1, model_2)
