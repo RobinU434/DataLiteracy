@@ -13,6 +13,8 @@ from studies.utils.setup_pyplot import (
     FIG_SAVE_BASE_PATH,
 )
 
+from tueplots.constants.color.palettes import tue_plot
+
 # class ForecastClass(Enum):
 #     """
 #     DWD offers 2 different forecasts,
@@ -55,6 +57,8 @@ def plot_accuracy(
     delta_time = pl.col("forecast_time_delta_hours")
 
     accumulation_window_hours_selection = [
+        # seems to lead to an infinite loop or something.
+        # 1,
         3,
         6,
         12,
@@ -69,7 +73,9 @@ def plot_accuracy(
     def get_model_2_data(
         accumulation_window_hours: int,
     ):
-        assert (accumulation_window_hours % 3) == 0
+        if (accumulation_window_hours % 3) != 0:
+            raise RuntimeError("unreachable")
+            return pl.lit(False)
         return (73 <= delta_time) & (
             delta_time < ((10 * 24) - accumulation_window_hours)
         )
@@ -183,6 +189,30 @@ def plot_accuracy(
     ax1: plt.Axes
     ax2: plt.Axes
 
+        # manually add a 1h datapoint
+
+    test_expr = (
+            pl.col("precipitation_forecast") > 0.0
+        ) == (pl.col("precipitation_real") > 0.0)
+
+    correct_pred = (joined.group_by(["forecast_time_delta_hours"])
+        .agg(
+            (test_expr.sum().cast(pl.datatypes.Float64) / test_expr.count()).alias(
+                "accuracy"
+            )
+        )
+        .sort("forecast_time_delta_hours")
+    )
+    times = correct_pred.filter(get_model_1_data(0))["forecast_time_delta_hours"]
+    vals = correct_pred.filter(get_model_1_data(0))["accuracy"]
+
+    ax1.plot(
+        times.to_numpy(),
+        vals.to_numpy(),
+        label="$w$ = 1h",
+        c = tue_plot[1],
+    )
+
     for accumulation_window_hours in accumulation_window_hours_selection:
         test_expr = (
             pl.col(f"precipitation_forecast_{accumulation_window_hours}h") > 0.0
@@ -209,14 +239,14 @@ def plot_accuracy(
         ax1.plot(
             times_1.to_numpy(),
             vals_1.to_numpy(),
-            label=f"$\Delta T$ = {accumulation_window_hours}h",
+            label=f"$w$ = {accumulation_window_hours}h",
             # c = choosen_palette[idx],
         )
 
         ax2.plot(
             times_2.to_numpy(),
             vals_2.to_numpy(),
-            # label=f"$\Delta T$ = {accumulation_window_hours}h",
+            # label=f"$w$ = {accumulation_window_hours}h",
             # c = choosen_palette[idx],
         )
 
