@@ -36,7 +36,7 @@ def get_recent(feature: str, data_root_dir: str = "../data/dwd/recent"):
     data_files = glob.glob(path)
     dfs: List[DataFrame] = []
     if len(data_files) == 0:
-        logging.fatal(f"No files at {data_root_dir}")
+        logging.fatal(f"No files with regex {path} found")
         return 
     for file in data_files:
         # print(pd.read_csv(data_files[0], sep=";"))
