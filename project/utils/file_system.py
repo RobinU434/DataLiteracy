@@ -30,8 +30,7 @@ def load_json(path) -> Dict[str, Any]:
 
 def remove(paths: Iterable[str]):
     for path in paths:
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-                continue
-            os.remove(path)
-        
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            continue
+        os.remove(path)

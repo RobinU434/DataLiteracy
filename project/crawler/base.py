@@ -10,6 +10,7 @@ class BaseCrawler(ABC):
         super().__init__()
 
         self._save_dir: str
+        self._url: str
 
     def get(self, save: bool = False):
         content = self._get()
@@ -27,3 +28,6 @@ class BaseCrawler(ABC):
     @abstractmethod
     def _get(self) -> Dict[str, Any]:
         raise NotImplementedError
+    
+    def __str__(self) -> str:
+        return f"{type(self).__name__} \n url: {self._url} \n save dir {self._save_dir}"

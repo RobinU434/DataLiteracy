@@ -21,7 +21,6 @@ def add_convert_to_csv_args(parser: ArgumentParser) -> ArgumentParser:
         help="force overwrite the existing files. Defaults to False",
         dest="force",
         action="store_true",
-        default="False",
     )
     return parser
 
@@ -102,11 +101,25 @@ def add_analyse_args(parser: ArgumentParser) -> ArgumentParser:
 
 def add_start_crawler_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
-        "--crawler-config-path",
+        "--output-dir",
         help="crawler config for individual apis",
+        dest="output_dir",
+        type=str,
+        default="./data"
+    )
+    parser.add_argument(
+        "--crawler-config-path",
+        help="base path for all downloaded crawler data. For each crawler you will get a subdir of this base output dir",
         dest="crawler_config_path",
         type=str,
         default="project/config/crawler.config.yaml",
+    )
+    parser.add_argument(
+        "--query-time",
+        help="at which time you would like to collect data from the forecast models",
+        dest="query_time",
+        type=str,
+        default="00:10"
     )
     return parser
 

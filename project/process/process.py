@@ -2,9 +2,7 @@ import datetime
 import glob
 import os
 from os import makedirs
-import shutil
 from typing import List
-from shutil import rmtree
 
 from tqdm import tqdm
 
@@ -35,25 +33,34 @@ class DataProcess:
         self._crawler: List[BaseCrawler]
 
     def _build_crawler(
-        self, crawler_config_path: str = "project/config/crawler.config.yaml"
+        self,
+        output_dir: str = "./data",
+        crawler_config_path: str = "project/config/crawler.config.yaml",
     ):
         self._crawler = []
         for crawler_config in load_yaml(crawler_config_path):
             name = crawler_config.pop("name")
             crawler_class = getattr(crawler, name)
-            self._crawler.append(crawler_class(**crawler_config))
+            crawler_class: BaseCrawler
+            self._crawler.append(crawler_class(save_dir=output_dir, **crawler_config))
 
     def start_crawler(
-        self, crawler_config_path: str = "project/config/crawler.config.yaml"
+        self,
+        output_dir: str = "./data",
+        crawler_config_path: str = "project/config/crawler.config.yaml",
+        query_time: str = "00:10"
     ):
         """
         start crawler to collect weather data from APIs specified in crawler config
 
         Args:
             crawler_config_path (str): crawler config for individual apis
+            output_dir (str): base path for all downloaded crawler data. For each crawler you will get a subdir of this base output dir
+            query_time (str): at which time a day you would like to collect data from the forecast models. Format "HH:MM". Defaults to 00:10 
         """
-        self._build_crawler(crawler_config_path)
-        crawler_manager = CrawlerManager(self._crawler, "00:10")
+        self._build_crawler(output_dir, crawler_config_path)
+        crawler_manager = CrawlerManager(self._crawler, query_time)
+        print(crawler_manager)
         crawler_manager.start()
 
     def analyse(
@@ -78,9 +85,9 @@ class DataProcess:
             save (bool, optional): if set to true save results. Defaults to True.
         """
         self._build_crawler()
-        for crawler in self._crawler:
-            content = crawler.get(save=save)
-            print(f"===== {type(crawler).__name__} ====")
+        for single_crawler in self._crawler:
+            content = single_crawler.get(save=save)
+            print(f"===== {type(single_crawler).__name__} ====")
             print(content)
 
     def get_historical(self, station_ids: List[int], save_path: str):
@@ -140,7 +147,9 @@ class DataProcess:
         mask = check_station_ids(station_ids)
         success_counter = 0
         file_names = []
-        for station_id, valid in tqdm(list(zip(station_ids, mask)), desc="Download files: "):
+        for station_id, valid in tqdm(
+            list(zip(station_ids, mask)), desc="Download files: "
+        ):
             if not valid:
                 continue
             file_name = ""
