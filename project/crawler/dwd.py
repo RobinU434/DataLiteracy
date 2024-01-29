@@ -5,11 +5,11 @@ import json
 
 
 class DWDCrawler(BaseCrawler):
-    def __init__(self, api_identifier: str, station_ids: List[int]) -> None:
+    def __init__(
+        self, api_identifier: str, station_ids: List[int], save_dir: str = "./data"
+    ) -> None:
         super().__init__()
-
-        # TODO: remove test
-        self._save_dir = "./project/data/dwd/test"
+        self._save_dir = save_dir.rstrip("/") + "/dwd/raw"
 
         self._url = self._build_url(api_identifier, station_ids)
 
