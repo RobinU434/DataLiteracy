@@ -102,6 +102,8 @@ The content of `project`:
 └── utils           # general tooling used by all components: interaction to filesystem, ...
 ```
 
+For extensive code documentation please refer either to the embedded docstring or to Doxygen documentation in [PDF](docs/code/latex/refman.pdf) or in [HTML](docs/code/html/index.html).   
+
 ## Data
 
 as previously mentioned we collected forecast data from 36 station across the state of Baden-Württemberg. 
