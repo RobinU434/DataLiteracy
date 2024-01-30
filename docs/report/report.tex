@@ -361,10 +361,9 @@ The threshold to determine if we actually had rain or not is set to $0$ as in
 \begin{figure}
     \centering
     \includegraphics{fig_mean.pdf}
-    \caption{The difference between forecast precipitation and reference
-        precipitation for time steps ahead for each station (gray), the mean over all
-        stations (blue), and the trend of the mean (orange). The left plot is for 3-day
-        forecast and the right for 10-day forecast}
+    \caption{The mean difference between forecast precipitation and reference
+    precipitation for depending on $\Delta t$ in blue and the mean absolute difference in green.
+    The left plot is for 3-day forecast and the right for 10-day forecast.}
     \label{fig:mean_trend}
     % TODO: y axis -0.5 up to 0.5 (dont cut gray lines)
     % TODO: y label [l /(m² h)]
@@ -408,7 +407,7 @@ simultaneously increasing the false positive and false negative rates.
     \centering
     \includegraphics{fig_accuracy.pdf}
     \caption{The accuracy for selected window sizes $w$ and for forecasts
-        $\Delta t$ into the future.}
+        $\Delta t$ into the future. On the left hand side we display the 3-day forecast and on the right the 10-day forecast}
     \label{fig:accuracy}
 \end{figure}
 
