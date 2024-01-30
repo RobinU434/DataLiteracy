@@ -13,13 +13,17 @@ The following chapters provide a brief overview how to use the codebase.
 
 ## Installation
 
-We use [poetry](https://python-poetry.org/) for package management in Python. If you didn't already installed it you can read up on it [here](https://python-poetry.org/docs/#installation).   
+We use [poetry](https://python-poetry.org/) for package management in Python. If you didn't already install it you can read up on it [here](#installing-poetry).   
 To install the dependencies execute in project root:
 ```bash
 poetry install
 ```
 
-For further insights into poetry we cna recommend their [documentation](https://python-poetry.org/docs/).
+You can either activate the venv poetry generates, or execute `poetry run python` instead of just `python`. 
+
+For further insights into poetry we can recommend their [documentation](https://python-poetry.org/docs/).
+
+Furthermore, this project uses git lfs, thus please install and activate it to properly clone this repository.
 
 ## Download Server
 
@@ -36,17 +40,18 @@ If you would like to extend this service also to other API feel free to implemen
 
 We provide collected forecast data on Git LFS. Therefore you should already have downloaded a bunch of json files from Git-LFS. Nevertheless you also need to do following steps in order to start the analysis.
 
-1. **Download historical data**: To asses the quality of a forecast model you have to download the historical data. Because this research project was conducted in Germany we use the historical and recent data from the DWD. To download each dataset respectively execute in project root:
-    ```bash
-    python -m project get-recent --station-ids 257 4189 13965 755 757 5688 1197 1214 1224 1255 6258 1584 6259 2074 7331 2575 2814 259 3402 5562 6275 3734 1602 3925 3927 4160 4169 4300 4349 6262 4703 6263 5229 4094 5664 5731 --save-path data/dwd/recent/ --features precipitation  air_temperature
-    ```
-    This will download the recent data (form the last 6 months) into `data/dwd/recent`.  
-    If your forecast data is older than 6 months you have to execute the same command but instead of using `get-recent` type `get-historical` (Note: Not tested yet).
-2. **Covert Json to CSV**: Our analysis script are based on a `DWDDataset` object which is based on csv files. Therefore you have to convert the forecast data form json format to csv format. To do so please execute:
+1. **Covert Json to CSV**: Our analysis script are based on a `DWDDataset` object which is based on csv files. Therefore you have to convert the forecast data from json to csv. To do so please execute:
     ```bash
     python -m project convert-to-csv --input data/dwd/raw --output data/dwd/csv
     ```
     This command will scrape the forecast data and convert it into individual csv files at the specified output directory.
+2. **(Not required) Download historical data**: To asses the quality of a forecast model you have to download the historical data. Because this research project was conducted in Germany we use the historical and recent data from the DWD. To download each dataset respectively execute in project root:
+    ```bash
+    python -m project get-recent --unpack --station-ids 257 4189 13965 755 757 5688 1197 1214 1224 1255 6258 1584 6259 2074 7331 2575 2814 259 3402 5562 6275 3734 1602 3925 3927 4160 4169 4300 4349 6262 4703 6263 5229 4094 5664 5731 --save-path data/dwd/recent/ --features precipitation  air_temperature
+    ```
+    This will download the recent data (form the last 6 months) into `data/dwd/recent`.
+    For this data to be used, you will have to have 
+    If your forecast data is older than 6 months you have to execute the same command but instead of using `get-recent` type `get-historical` (Note: Not tested yet).
 
 ## Do Analysis
 
@@ -63,7 +68,7 @@ python -m project --help
 ```
 and into the individual commands with:
 ```bash
-python -m <command> --help
+python -m project <command> --help
 ```
 
 ## Code base
