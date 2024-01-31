@@ -12,6 +12,7 @@ def execute(args: dict) -> bool:
             module.start_crawler(
                 output_dir=args["output_dir"],
                 crawler_config_path=args["crawler_config_path"],
+                query_time=args["query_time"],
             )
 
         case "analyse":
