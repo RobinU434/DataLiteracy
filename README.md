@@ -7,7 +7,7 @@ The project contains 3 main building blocks.
 
 1. A dockerized download server to download the forcasts from the [open weather api](https://dwd.api.bund.dev/)
 2. Studies we conducted on the data formulated in [Jupyter Notebooks](https://jupyter.org/)
-3. A summarizing report over the work we conducted. 
+3. A summarizing [report](./docs/report/report.pdf) over the work we conducted. 
 
 The following chapters provide a brief overview how to use the codebase. 
 
